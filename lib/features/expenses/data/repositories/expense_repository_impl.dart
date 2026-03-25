@@ -20,7 +20,7 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   }
 
   @override
-  Future<Expense> recordExpenseFromText(String text) async {
+  Future<Expense> analyzeMovementFromText(String text) async {
     Map<String, Object> parsed;
 
     try {
@@ -30,8 +30,9 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
     }
 
     final String typeValue = parsed['type'] as String? ?? TransactionType.expense.name;
+    final String detectedCategory = parsed['category'] as String? ?? 'Otros';
 
-    final Expense expense = Expense(
+    return Expense(
       amount: parsed['amount'] as double,
       currency: parsed['currency'] as String,
       type: TransactionType.values.firstWhere(
@@ -39,10 +40,20 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
         orElse: () => TransactionType.expense,
       ),
       description: parsed['description'] as String,
-      category: parsed['category'] as String,
+      category: detectedCategory,
+      tags: <String>[detectedCategory],
       timestamp: DateTime.parse(parsed['timestamp'] as String),
     );
+  }
 
+  @override
+  Future<Expense> saveMovement(Expense expense) {
     return _localDataSource.insertExpense(expense);
+  }
+
+  @override
+  Future<Expense> recordExpenseFromText(String text) async {
+    final Expense analyzed = await analyzeMovementFromText(text);
+    return saveMovement(analyzed);
   }
 }

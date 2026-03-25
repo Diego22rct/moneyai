@@ -18,7 +18,7 @@ class SQLiteService {
 
     _database = await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: (Database db, int version) async {
         await _createExpensesTable(db);
         await _createModelConfigsTable(db);
@@ -40,6 +40,12 @@ class SQLiteService {
           await _createModelRuntimeConfigsTable(db);
           await _seedDefaultRuntimeConfig(db);
         }
+
+        if (oldVersion < 4) {
+          await db.execute(
+            "ALTER TABLE $expensesTable ADD COLUMN tags_json TEXT NOT NULL DEFAULT '[]'",
+          );
+        }
       },
     );
 
@@ -55,6 +61,7 @@ class SQLiteService {
         type TEXT NOT NULL DEFAULT 'expense',
         description TEXT NOT NULL,
         category TEXT NOT NULL,
+        tags_json TEXT NOT NULL DEFAULT '[]',
         timestamp TEXT NOT NULL
       )
     ''');

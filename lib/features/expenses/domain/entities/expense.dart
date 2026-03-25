@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 enum TransactionType { expense, income }
 
 class Expense {
@@ -8,6 +10,7 @@ class Expense {
     required this.type,
     required this.description,
     required this.category,
+    this.tags = const <String>[],
     required this.timestamp,
   });
 
@@ -17,6 +20,7 @@ class Expense {
   final TransactionType type;
   final String description;
   final String category;
+  final List<String> tags;
   final DateTime timestamp;
 
   Expense copyWith({
@@ -26,6 +30,7 @@ class Expense {
     TransactionType? type,
     String? description,
     String? category,
+    List<String>? tags,
     DateTime? timestamp,
   }) {
     return Expense(
@@ -35,6 +40,7 @@ class Expense {
       type: type ?? this.type,
       description: description ?? this.description,
       category: category ?? this.category,
+      tags: tags ?? this.tags,
       timestamp: timestamp ?? this.timestamp,
     );
   }
@@ -47,12 +53,15 @@ class Expense {
       'type': type.name,
       'description': description,
       'category': category,
+      'tags_json': jsonEncode(tags),
       'timestamp': timestamp.toIso8601String(),
     };
   }
 
   factory Expense.fromMap(Map<String, Object?> map) {
     final String typeValue = (map['type'] as String?) ?? TransactionType.expense.name;
+    final String rawTags = (map['tags_json'] as String?) ?? '[]';
+    final List<String> parsedTags = _decodeTags(rawTags);
 
     return Expense(
       id: map['id'] as int?,
@@ -64,7 +73,25 @@ class Expense {
       ),
       description: map['description'] as String,
       category: map['category'] as String,
+      tags: parsedTags,
       timestamp: DateTime.parse(map['timestamp'] as String),
     );
+  }
+
+  static List<String> _decodeTags(String rawTags) {
+    try {
+      final dynamic decoded = jsonDecode(rawTags);
+      if (decoded is! List<dynamic>) {
+        return const <String>[];
+      }
+      return decoded
+          .whereType<String>()
+          .map((value) => value.trim())
+          .where((value) => value.isNotEmpty)
+          .toSet()
+          .toList();
+    } catch (_) {
+      return const <String>[];
+    }
   }
 }

@@ -57,6 +57,87 @@ final expenseListProvider = AsyncNotifierProvider<ExpenseListNotifier, List<Expe
   ExpenseListNotifier.new,
 );
 
+class MonthlyBalanceSummary {
+  const MonthlyBalanceSummary({
+    required this.income,
+    required this.expense,
+  });
+
+  final double income;
+  final double expense;
+
+  double get net => income - expense;
+}
+
+class TagTotal {
+  const TagTotal({
+    required this.tag,
+    required this.amount,
+    required this.count,
+  });
+
+  final String tag;
+  final double amount;
+  final int count;
+}
+
+final monthlyBalanceProvider = Provider<AsyncValue<MonthlyBalanceSummary>>((ref) {
+  final AsyncValue<List<Expense>> value = ref.watch(expenseListProvider);
+
+  return value.whenData((items) {
+    final DateTime now = DateTime.now();
+    final Iterable<Expense> monthlyItems = items.where(
+      (expense) =>
+          expense.timestamp.toLocal().year == now.year &&
+          expense.timestamp.toLocal().month == now.month,
+    );
+
+    double totalIncome = 0;
+    double totalExpense = 0;
+
+    for (final Expense item in monthlyItems) {
+      if (item.type == TransactionType.income) {
+        totalIncome += item.amount;
+      } else {
+        totalExpense += item.amount;
+      }
+    }
+
+    return MonthlyBalanceSummary(income: totalIncome, expense: totalExpense);
+  });
+});
+
+final tagRankingProvider = Provider<AsyncValue<List<TagTotal>>>((ref) {
+  final AsyncValue<List<Expense>> value = ref.watch(expenseListProvider);
+
+  return value.whenData((items) {
+    final Map<String, TagTotal> map = <String, TagTotal>{};
+
+    for (final Expense expense in items) {
+      final List<String> tags = expense.tags.isEmpty ? <String>[expense.category] : expense.tags;
+
+      for (final String rawTag in tags) {
+        final String tag = rawTag.trim();
+        if (tag.isEmpty) {
+          continue;
+        }
+
+        final TagTotal? current = map[tag];
+        map[tag] = TagTotal(
+          tag: tag,
+          amount: (current?.amount ?? 0) + expense.amount,
+          count: (current?.count ?? 0) + 1,
+        );
+      }
+    }
+
+    final List<TagTotal> ranking = map.values.toList()
+      ..sort((a, b) => b.amount.compareTo(a.amount));
+
+    return ranking;
+  });
+});
+
 class ExpenseListNotifier extends AsyncNotifier<List<Expense>> {
   @override
   Future<List<Expense>> build() async {
