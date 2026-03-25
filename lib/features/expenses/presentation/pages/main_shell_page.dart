@@ -30,7 +30,6 @@ class _MainShellPageState extends State<MainShellPage> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: AppTheme.surfaceHigh,
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
               ),
               child: const Icon(Icons.person, size: 18),
             ),
@@ -73,7 +72,6 @@ class _MainShellPageState extends State<MainShellPage> {
         decoration: BoxDecoration(
           color: AppTheme.surface.withValues(alpha: 0.62),
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
           boxShadow: <BoxShadow>[
             BoxShadow(
               blurRadius: 28,
@@ -112,7 +110,7 @@ class _MainShellPageState extends State<MainShellPage> {
               ),
               child: IconButton(
                 onPressed: () => setState(() => _index = 1),
-                icon: const Icon(Icons.add, color: Color(0xFF2C0051), size: 28),
+                icon: const Icon(Icons.add, color: AppTheme.background, size: 28),
               ),
             ),
             _NavItem(

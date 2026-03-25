@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:moneyai/core/theme/app_theme.dart';
 import 'package:moneyai/features/expenses/domain/entities/expense.dart';
 import 'package:moneyai/features/expenses/presentation/providers/expense_capture_controller.dart';
 import 'package:moneyai/features/expenses/presentation/providers/expense_list_provider.dart';
@@ -56,7 +57,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                 decoration: const InputDecoration(
                   labelText: 'Describe tu gasto o ingreso',
                   hintText: 'Ej: Me pagaron 1200 de salario',
-                  border: OutlineInputBorder(),
                 ),
                 minLines: 1,
                 maxLines: 2,
@@ -165,11 +165,11 @@ class _CaptureFeedback extends StatelessWidget {
     Color color;
     switch (status) {
       case CaptureStatus.success:
-        color = Colors.green;
+        color = AppTheme.secondary;
       case CaptureStatus.error:
-        color = Colors.red;
+        color = AppTheme.danger;
       default:
-        color = Colors.blueGrey;
+        color = AppTheme.onSurfaceMuted;
     }
 
     return Container(
@@ -177,7 +177,6 @@ class _CaptureFeedback extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        border: Border.all(color: color.withValues(alpha: 0.35)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -207,7 +206,7 @@ class ExpenseTile extends StatelessWidget {
         title: Text(
           amountFormat.format(expense.amount),
           style: TextStyle(
-            color: isIncome ? Colors.green.shade700 : Colors.red.shade700,
+            color: isIncome ? AppTheme.secondary : AppTheme.danger,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -219,13 +218,13 @@ class ExpenseTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: (isIncome ? Colors.green : Colors.red).withValues(alpha: 0.12),
+                color: (isIncome ? AppTheme.secondary : AppTheme.danger).withValues(alpha: 0.14),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
                 isIncome ? 'Ingreso' : 'Gasto',
                 style: TextStyle(
-                  color: isIncome ? Colors.green.shade800 : Colors.red.shade800,
+                  color: isIncome ? AppTheme.secondary : AppTheme.danger,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                 ),
@@ -252,13 +251,12 @@ class _ListeningBadge extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.blue.withValues(alpha: 0.08),
-        border: Border.all(color: Colors.blue.withValues(alpha: 0.35)),
+        color: AppTheme.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8),
       ),
       child: const Row(
         children: <Widget>[
-          Icon(Icons.graphic_eq, size: 18, color: Colors.blue),
+          Icon(Icons.graphic_eq, size: 18, color: AppTheme.primary),
           SizedBox(width: 8),
           Text('Escuchando... habla ahora'),
         ],

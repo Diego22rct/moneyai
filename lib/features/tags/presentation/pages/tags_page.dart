@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:moneyai/core/theme/app_theme.dart';
 import 'package:moneyai/features/expenses/domain/entities/expense.dart';
 import 'package:moneyai/features/expenses/presentation/providers/expense_list_provider.dart';
 
@@ -70,13 +71,6 @@ class _TagsPageState extends ConsumerState<TagsPage> {
                                           .primary
                                           .withValues(alpha: 0.12)
                                       : Theme.of(context).colorScheme.surfaceContainer,
-                                  border: Border.all(
-                                    color: selected
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .outlineVariant,
-                                  ),
                                 ),
                                 child: Row(
                                   children: <Widget>[
@@ -136,7 +130,7 @@ class _TagsPageState extends ConsumerState<TagsPage> {
                                   ),
                                   leading: Icon(
                                     isIncome ? Icons.add_circle : Icons.remove_circle,
-                                    color: isIncome ? Colors.green : Colors.red,
+                                    color: isIncome ? AppTheme.secondary : AppTheme.danger,
                                   ),
                                   title: Text(expense.description),
                                   subtitle: Text(expense.tags.join(' • ')),

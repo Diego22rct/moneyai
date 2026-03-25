@@ -4,19 +4,21 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTheme {
   const AppTheme._();
 
-  static const Color background = Color(0xFF131313);
-  static const Color surface = Color(0xFF1C1B1B);
+  static const Color background = Color(0xFF0E0E0E);
+  static const Color surface = Color(0xFF131313);
+  static const Color surfaceLow = Color(0xFF1C1B1B);
   static const Color surfaceHigh = Color(0xFF2A2A2A);
-  static const Color primary = Color(0xFFDDB7FF);
-  static const Color primaryContainer = Color(0xFFB76DFF);
+  static const Color primary = Color(0xFF4EDEA3);
+  static const Color primaryContainer = Color(0xFF10B981);
   static const Color secondary = Color(0xFF4EDEA3);
   static const Color onSurface = Color(0xFFE5E2E1);
-  static const Color onSurfaceMuted = Color(0xFFCBC3D7);
+  static const Color onSurfaceMuted = Color(0xFFBBCABF);
+  static const Color danger = Color(0xFFFFB4AB);
 
-  static LinearGradient get neonPrimaryGradient => const LinearGradient(
+    static LinearGradient get neonPrimaryGradient => const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: <Color>[Color(0xFFDDB7FF), Color(0xFFB76DFF)],
+      colors: <Color>[Color(0xFF4EDEA3), Color(0xFF10B981)],
       );
 
   static ThemeData darkTheme() {
@@ -36,17 +38,17 @@ class AppTheme {
     );
 
     final TextTheme textTheme = baseText.copyWith(
-      labelSmall: GoogleFonts.inter(
+      labelSmall: GoogleFonts.manrope(
         textStyle: baseText.labelSmall,
         color: onSurfaceMuted,
         letterSpacing: 0.3,
       ),
-      labelMedium: GoogleFonts.inter(
+      labelMedium: GoogleFonts.manrope(
         textStyle: baseText.labelMedium,
         color: onSurfaceMuted,
         letterSpacing: 0.35,
       ),
-      labelLarge: GoogleFonts.inter(
+      labelLarge: GoogleFonts.manrope(
         textStyle: baseText.labelLarge,
         color: onSurfaceMuted,
         letterSpacing: 0.4,
@@ -67,7 +69,7 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
       ),
       cardTheme: CardThemeData(
-        color: surfaceHigh.withValues(alpha: 0.75),
+        color: surfaceHigh.withValues(alpha: 0.8),
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       ),
@@ -85,27 +87,27 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: surfaceHigh.withValues(alpha: 0.55),
-        hintStyle: GoogleFonts.inter(color: onSurfaceMuted.withValues(alpha: 0.9)),
-        labelStyle: GoogleFonts.inter(color: onSurfaceMuted),
+        fillColor: surfaceHigh.withValues(alpha: 0.65),
+        hintStyle: GoogleFonts.manrope(color: onSurfaceMuted.withValues(alpha: 0.9)),
+        labelStyle: GoogleFonts.manrope(color: onSurfaceMuted),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(color: primary.withValues(alpha: 0.6)),
+          borderSide: BorderSide(color: primary.withValues(alpha: 0.65), width: 2),
         ),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: surfaceHigh.withValues(alpha: 0.75),
         selectedColor: primaryContainer.withValues(alpha: 0.8),
         side: BorderSide.none,
-        labelStyle: GoogleFonts.inter(color: onSurface),
+        labelStyle: GoogleFonts.manrope(color: onSurface),
       ),
     );
   }

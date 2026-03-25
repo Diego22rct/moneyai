@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneyai/core/theme/app_theme.dart';
 import 'package:moneyai/features/model_selection/domain/entities/model_option.dart';
 import 'package:moneyai/features/model_selection/presentation/pages/llama_model_download_page.dart';
 import 'package:moneyai/features/model_selection/presentation/providers/model_selector_provider.dart';
@@ -29,7 +30,7 @@ class SettingsPage extends ConsumerWidget {
                       leading: Icon(Icons.mic),
                       title: Text('Speech to Text (device)'),
                       subtitle: Text('Modelo STT activo y unico para Android e iOS.'),
-                      trailing: Icon(Icons.check_circle, color: Colors.green),
+                      trailing: Icon(Icons.check_circle, color: AppTheme.secondary),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -114,10 +115,10 @@ class _ModelOptionTile extends StatelessWidget {
         title: Text(option.title),
         subtitle: Text(option.description),
         trailing: isSelected
-            ? const Icon(Icons.check_circle, color: Colors.green)
+            ? const Icon(Icons.check_circle, color: AppTheme.secondary)
             : option.available
                 ? const Icon(Icons.radio_button_unchecked)
-                : const Icon(Icons.lock_outline, color: Colors.grey),
+                : const Icon(Icons.lock_outline, color: AppTheme.onSurfaceMuted),
         onTap: onSelected,
       ),
     );

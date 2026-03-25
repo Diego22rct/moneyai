@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneyai/core/theme/app_theme.dart';
 import 'package:moneyai/features/model_selection/domain/entities/llama_remote_file.dart';
 import 'package:moneyai/features/model_selection/presentation/providers/model_download_provider.dart';
 
@@ -45,7 +46,6 @@ class _LlamaModelDownloadPageState extends ConsumerState<LlamaModelDownloadPage>
                 decoration: InputDecoration(
                   labelText: 'Buscar en Hugging Face',
                   hintText: 'Ej: qwen gguf',
-                  border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     onPressed: state.isSearching
                         ? null
@@ -76,7 +76,7 @@ class _LlamaModelDownloadPageState extends ConsumerState<LlamaModelDownloadPage>
               ],
               if (state.statusMessage != null) ...<Widget>[
                 const SizedBox(height: 10),
-                Text(state.statusMessage!, style: const TextStyle(color: Colors.green)),
+                Text(state.statusMessage!, style: const TextStyle(color: AppTheme.secondary)),
               ],
               if (state.errorMessage != null) ...<Widget>[
                 const SizedBox(height: 10),
@@ -162,9 +162,8 @@ class _CurrentModelBanner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.blueGrey.withValues(alpha: 0.35)),
         borderRadius: BorderRadius.circular(8),
-        color: Colors.blueGrey.withValues(alpha: 0.08),
+        color: AppTheme.surfaceHigh.withValues(alpha: 0.75),
       ),
       child: Text(
         hasModel ? 'Modelo activo:\n$path' : 'Aun no hay modelo local descargado.',

@@ -108,7 +108,6 @@ class _CapturePageState extends ConsumerState<CapturePage> with SingleTickerProv
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             color: AppTheme.secondary.withValues(alpha: 0.11),
-            border: Border.all(color: AppTheme.secondary.withValues(alpha: 0.28)),
           ),
           child: const Row(
             children: <Widget>[
@@ -193,7 +192,7 @@ class _CapturePageState extends ConsumerState<CapturePage> with SingleTickerProv
           style: FilledButton.styleFrom(
             minimumSize: const Size.fromHeight(54),
             backgroundColor: AppTheme.primaryContainer,
-            foregroundColor: const Color(0xFF2C0051),
+            foregroundColor: AppTheme.background,
           ),
         ),
         const SizedBox(height: 24),
@@ -338,7 +337,7 @@ class _CaptureFeedback extends StatelessWidget {
     if (status == CaptureStatus.success) {
       color = AppTheme.secondary;
     } else if (status == CaptureStatus.error) {
-      color = const Color(0xFFFFB4AB);
+      color = AppTheme.danger;
     } else if (status == CaptureStatus.reviewing) {
       color = AppTheme.primary;
     }
@@ -349,7 +348,6 @@ class _CaptureFeedback extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: color.withValues(alpha: 0.08),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Text(message!, style: TextStyle(color: color)),
     );
@@ -390,7 +388,7 @@ class _MicActionButton extends StatelessWidget {
         icon: Icon(
           isListening ? Icons.stop_rounded : Icons.mic,
           size: 36,
-          color: const Color(0xFF2C0051),
+          color: AppTheme.background,
         ),
       ),
     );

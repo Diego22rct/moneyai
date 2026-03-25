@@ -7,10 +7,9 @@ void main() {
   testWidgets('Muestra pantalla principal de MoneyAI', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: MoneyAiApp()));
 
-    expect(find.text('Dashboard'), findsOneWidget);
-    expect(find.text('Balance del mes actual'), findsOneWidget);
-    expect(find.text('Inicio'), findsOneWidget);
-    expect(find.text('Captura'), findsOneWidget);
-    expect(find.text('Etiquetas'), findsOneWidget);
+    expect(find.text('MONEYAI'), findsOneWidget);
+    expect(find.text('TOTAL LIQUID BALANCE'), findsOneWidget);
+    expect(find.text('Spending Flow'), findsOneWidget);
+    expect(find.text('Ledger Activity'), findsOneWidget);
   });
 }

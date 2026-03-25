@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:moneyai/core/theme/app_theme.dart';
 import 'package:moneyai/features/expenses/domain/entities/expense.dart';
 import 'package:moneyai/features/expenses/presentation/providers/expense_capture_controller.dart';
 import 'package:moneyai/features/expenses/presentation/providers/voice_input_controller.dart';
@@ -264,11 +265,10 @@ class _InlineInfoCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.blue.withValues(alpha: 0.08),
-        border: Border.all(color: Colors.blue.withValues(alpha: 0.35)),
+        color: AppTheme.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Text(message),
+      child: Text(message, style: const TextStyle(color: AppTheme.primary)),
     );
   }
 }
@@ -284,11 +284,10 @@ class _InlineErrorCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.red.withValues(alpha: 0.08),
-        border: Border.all(color: Colors.red.withValues(alpha: 0.35)),
+        color: AppTheme.danger.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Text(message, style: TextStyle(color: Colors.red.shade700)),
+      child: Text(message, style: const TextStyle(color: AppTheme.danger)),
     );
   }
 }
