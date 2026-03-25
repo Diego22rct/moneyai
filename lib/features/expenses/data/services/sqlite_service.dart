@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 class SQLiteService {
   static const String expensesTable = 'expenses';
   static const String modelConfigsTable = 'model_configs';
+  static const String modelRuntimeConfigsTable = 'model_runtime_configs';
 
   Database? _database;
 
@@ -17,11 +18,13 @@ class SQLiteService {
 
     _database = await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (Database db, int version) async {
         await _createExpensesTable(db);
         await _createModelConfigsTable(db);
+        await _createModelRuntimeConfigsTable(db);
         await _seedDefaultModels(db);
+        await _seedDefaultRuntimeConfig(db);
       },
       onUpgrade: (Database db, int oldVersion, int newVersion) async {
         if (oldVersion < 2) {
@@ -31,6 +34,11 @@ class SQLiteService {
 
           await _createModelConfigsTable(db);
           await _seedDefaultModels(db);
+        }
+
+        if (oldVersion < 3) {
+          await _createModelRuntimeConfigsTable(db);
+          await _seedDefaultRuntimeConfig(db);
         }
       },
     );
@@ -64,9 +72,26 @@ class SQLiteService {
     ''');
   }
 
+  Future<void> _createModelRuntimeConfigsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS $modelRuntimeConfigsTable (
+        task TEXT PRIMARY KEY,
+        model_path TEXT,
+        native_lib_path TEXT,
+        whisper_variant TEXT NOT NULL DEFAULT 'tiny',
+        updated_at TEXT NOT NULL
+      )
+    ''');
+  }
+
   Future<void> _seedDefaultModels(Database db) async {
     await _ensureDefaultModel(db, task: 'stt', modelId: 'speech_to_text');
     await _ensureDefaultModel(db, task: 'nlu', modelId: 'regex_local');
+  }
+
+  Future<void> _seedDefaultRuntimeConfig(Database db) async {
+    await _ensureDefaultRuntimeConfig(db, task: 'stt');
+    await _ensureDefaultRuntimeConfig(db, task: 'nlu');
   }
 
   Future<void> _ensureDefaultModel(
@@ -90,6 +115,27 @@ class SQLiteService {
       'model_id': modelId,
       'is_active': 1,
       'created_at': DateTime.now().toUtc().toIso8601String(),
+    });
+  }
+
+  Future<void> _ensureDefaultRuntimeConfig(Database db, {required String task}) async {
+    final List<Map<String, Object?>> existing = await db.query(
+      modelRuntimeConfigsTable,
+      where: 'task = ?',
+      whereArgs: <Object>[task],
+      limit: 1,
+    );
+
+    if (existing.isNotEmpty) {
+      return;
+    }
+
+    await db.insert(modelRuntimeConfigsTable, <String, Object?>{
+      'task': task,
+      'model_path': null,
+      'native_lib_path': null,
+      'whisper_variant': 'tiny',
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
     });
   }
 }

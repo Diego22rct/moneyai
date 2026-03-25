@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moneyai/features/ai_services/data/implementations/llama_nlu_service.dart';
-import 'package:moneyai/features/ai_services/data/implementations/whisper_stt_service.dart';
 import 'package:moneyai/features/ai_services/domain/services/nlu_service.dart';
 import 'package:moneyai/features/ai_services/domain/services/stt_service.dart';
 import 'package:moneyai/features/expenses/data/datasources/expense_local_datasource.dart';
@@ -29,22 +28,13 @@ final nluServiceProvider = Provider<NluService>((ref) {
       );
 
   if (selected == 'llama_local') {
-    return LlamaNluService();
+    return LlamaNluService(ref.watch(aiRuntimeConfigLocalDataSourceProvider));
   }
 
   return const LocalNluService();
 });
 
 final sttServiceProvider = Provider<SttService>((ref) {
-  final selected = ref.watch(activeSttModelProvider).maybeWhen(
-        data: (value) => value,
-        orElse: () => 'speech_to_text',
-      );
-
-  if (selected == 'whisper_tiny_local') {
-    return WhisperSttService();
-  }
-
   return LocalSttService();
 });
 

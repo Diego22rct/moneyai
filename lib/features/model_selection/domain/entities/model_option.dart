@@ -22,13 +22,7 @@ const List<ModelOption> kSttModelOptions = <ModelOption>[
   ModelOption(
     id: 'speech_to_text',
     title: 'Speech to Text (device)',
-    description: 'Reconocimiento de voz del dispositivo, rapido para MVP.',
-  ),
-  ModelOption(
-    id: 'whisper_tiny_local',
-    title: 'Whisper Tiny (local)',
-    description: 'Preparado para integracion local de Whisper.',
-    available: false,
+    description: 'Reconocimiento de voz del dispositivo. Compatible con Android e iOS.',
   ),
 ];
 
@@ -41,7 +35,6 @@ const List<ModelOption> kNluModelOptions = <ModelOption>[
   ModelOption(
     id: 'llama_local',
     title: 'Llama Local',
-    description: 'Preparado para extraccion financiera con Llama.',
-    available: false,
+    description: 'Extraccion financiera con modelo GGUF local.',
   ),
 ];
