@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:moneyai/core/theme/app_theme.dart';
 import 'package:moneyai/features/expenses/domain/entities/expense.dart';
 import 'package:moneyai/features/expenses/presentation/providers/expense_list_provider.dart';
 
@@ -17,125 +18,217 @@ class DashboardPage extends ConsumerWidget {
       decimalDigits: 2,
     );
 
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.all(16),
-        children: <Widget>[
-          Text(
-            'Balance del mes actual',
-            style: Theme.of(context).textTheme.titleLarge,
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 130),
+      children: <Widget>[
+        const Text(
+          'TOTAL LIQUID BALANCE',
+          style: TextStyle(
+            color: AppTheme.onSurfaceMuted,
+            fontSize: 12,
+            letterSpacing: 2.2,
+            fontWeight: FontWeight.w500,
           ),
-          const SizedBox(height: 12),
-          monthlySummary.when(
-            data: (summary) {
-              return Column(
-                children: <Widget>[
-                  _BalanceCard(
-                    title: 'Balance neto',
-                    value: amountFormat.format(summary.net),
-                    color: summary.net >= 0 ? Colors.green : Colors.red,
-                    icon: summary.net >= 0 ? Icons.trending_up : Icons.trending_down,
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: _MiniStatCard(
-                          title: 'Ingresos',
-                          value: amountFormat.format(summary.income),
-                          color: Colors.green,
-                        ),
+        ),
+        const SizedBox(height: 8),
+        monthlySummary.when(
+          data: (summary) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  amountFormat.format(summary.net),
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.onSurface,
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _MiniStatCard(
-                          title: 'Gastos',
-                          value: amountFormat.format(summary.expense),
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(999),
+                    color: AppTheme.secondary.withValues(alpha: 0.12),
                   ),
-                ],
-              );
-            },
-            error: (error, stackTrace) => const _InfoCard(message: 'No se pudo calcular el balance mensual.'),
-            loading: () => const Center(child: CircularProgressIndicator()),
+                  child: Text(
+                    '${summary.net >= 0 ? '+' : ''}${((summary.net == 0 ? 0 : (summary.net / (summary.income == 0 ? 1 : summary.income)) * 100)).toStringAsFixed(1)}% vs last month',
+                    style: const TextStyle(
+                      color: AppTheme.secondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+          loading: () => const Padding(
+            padding: EdgeInsets.only(top: 12),
+            child: CircularProgressIndicator(),
           ),
-          const SizedBox(height: 16),
-          Text(
-            'Movimientos recientes',
-            style: Theme.of(context).textTheme.titleMedium,
+          error: (error, stackTrace) => const _GlassCard(
+            child: Text('No se pudo calcular el balance mensual.'),
           ),
-          const SizedBox(height: 8),
-          expensesState.when(
-            data: (items) {
-              if (items.isEmpty) {
-                return const _InfoCard(message: 'Todavia no tienes movimientos registrados.');
-              }
+        ),
+        const SizedBox(height: 30),
+        const _SectionHeader(title: 'Spending Flow', action: 'View Insights'),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 178,
+          child: ref.watch(tagRankingProvider).when(
+                data: (tags) {
+                  if (tags.isEmpty) {
+                    return const _GlassCard(
+                      child: Center(child: Text('Aun no hay movimientos para mostrar.')),
+                    );
+                  }
 
-              final List<Expense> recent = items.take(5).toList();
-              return Column(
-                children: recent
-                    .map((expense) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: _RecentMovementTile(expense: expense),
-                        ))
-                    .toList(),
+                  final List<TagTotal> top = tags.take(6).toList();
+                  return ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: top.length,
+                    separatorBuilder: (context, index) => const SizedBox(width: 12),
+                    itemBuilder: (context, index) {
+                      final item = top[index];
+                      final Color accent = index.isEven ? AppTheme.primary : AppTheme.secondary;
+                      return _FlowCard(
+                        title: item.tag,
+                        amount: amountFormat.format(item.amount),
+                        accent: accent,
+                        progress: ((item.count * 15).clamp(10, 100)) / 100,
+                      );
+                    },
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stackTrace) => const _GlassCard(
+                  child: Text('No se pudo construir el flujo por etiquetas.'),
+                ),
+              ),
+        ),
+        const SizedBox(height: 30),
+        const _SectionHeader(title: 'Ledger Activity', action: 'LAST 7 DAYS'),
+        const SizedBox(height: 12),
+        expensesState.when(
+          data: (items) {
+            if (items.isEmpty) {
+              return const _GlassCard(
+                child: Text('Todavia no tienes movimientos registrados.'),
               );
-            },
-            error: (error, stackTrace) => const _InfoCard(message: 'No se pudo cargar movimientos.'),
-            loading: () => const Center(child: CircularProgressIndicator()),
+            }
+
+            return Column(
+              children: items.take(6).map((expense) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _LedgerTile(expense: expense),
+                );
+              }).toList(),
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stackTrace) => const _GlassCard(
+            child: Text('No se pudo cargar movimientos recientes.'),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 20),
+        const _InsightCard(),
+      ],
     );
   }
 }
 
-class _BalanceCard extends StatelessWidget {
-  const _BalanceCard({
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.title, required this.action});
+
+  final String title;
+  final String action;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Text(
+          title,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        Text(
+          action,
+          style: TextStyle(
+            color: action == 'View Insights' ? AppTheme.primary : AppTheme.onSurfaceMuted,
+            fontSize: 12,
+            letterSpacing: 0.7,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FlowCard extends StatelessWidget {
+  const _FlowCard({
     required this.title,
-    required this.value,
-    required this.color,
-    required this.icon,
+    required this.amount,
+    required this.accent,
+    required this.progress,
   });
 
   final String title;
-  final String value;
-  final Color color;
-  final IconData icon;
+  final String amount;
+  final Color accent;
+  final double progress;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
+      width: 156,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: <Color>[color.withValues(alpha: 0.18), Theme.of(context).colorScheme.surface],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.35)),
+        borderRadius: BorderRadius.circular(26),
+        color: AppTheme.surfaceHigh.withValues(alpha: 0.7),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Icon(icon, color: color),
-          const SizedBox(width: 10),
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Icon(Icons.label, color: accent),
+          ),
+          const SizedBox(height: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                Text(title, style: Theme.of(context).textTheme.labelLarge),
-                const SizedBox(height: 2),
                 Text(
-                  value,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: color,
-                        fontWeight: FontWeight.w700,
-                      ),
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: AppTheme.onSurfaceMuted),
+                ),
+                const SizedBox(height: 4),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    amount,
+                    style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w700),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(999),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 4,
+                    backgroundColor: Colors.white.withValues(alpha: 0.08),
+                    color: accent,
+                  ),
                 ),
               ],
             ),
@@ -146,40 +239,8 @@ class _BalanceCard extends StatelessWidget {
   }
 }
 
-class _MiniStatCard extends StatelessWidget {
-  const _MiniStatCard({
-    required this.title,
-    required this.value,
-    required this.color,
-  });
-
-  final String title;
-  final String value;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        color: color.withValues(alpha: 0.08),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(title, style: Theme.of(context).textTheme.labelMedium),
-          const SizedBox(height: 2),
-          Text(value, style: Theme.of(context).textTheme.titleMedium),
-        ],
-      ),
-    );
-  }
-}
-
-class _RecentMovementTile extends StatelessWidget {
-  const _RecentMovementTile({required this.expense});
+class _LedgerTile extends StatelessWidget {
+  const _LedgerTile({required this.expense});
 
   final Expense expense;
 
@@ -187,41 +248,102 @@ class _RecentMovementTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isIncome = expense.type == TransactionType.income;
 
-    return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: (isIncome ? Colors.green : Colors.red).withValues(alpha: 0.15),
-          child: Icon(
-            isIncome ? Icons.arrow_downward : Icons.arrow_upward,
-            color: isIncome ? Colors.green : Colors.red,
+    return _GlassCard(
+      child: Row(
+        children: <Widget>[
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.07),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(
+              isIncome ? Icons.payments : Icons.shopping_cart,
+              color: isIncome ? AppTheme.secondary : AppTheme.primary,
+            ),
           ),
-        ),
-        title: Text(expense.description),
-        subtitle: Text(
-          expense.tags.isEmpty ? expense.category : expense.tags.join(' • '),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(expense.description, maxLines: 1, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 2),
+                Text(
+                  DateFormat('dd MMM, HH:mm').format(expense.timestamp.toLocal()),
+                  style: const TextStyle(color: AppTheme.onSurfaceMuted),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            '${isIncome ? '+' : '-'}${expense.amount.toStringAsFixed(2)}',
+            style: TextStyle(
+              color: isIncome ? AppTheme.secondary : AppTheme.onSurface,
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _InfoCard extends StatelessWidget {
-  const _InfoCard({required this.message});
+class _InsightCard extends StatelessWidget {
+  const _InsightCard();
 
-  final String message;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            AppTheme.primary.withValues(alpha: 0.14),
+            Colors.transparent,
+          ],
+        ),
+        color: AppTheme.surfaceHigh.withValues(alpha: 0.7),
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Ethereal Insight',
+            style: TextStyle(color: AppTheme.primary, fontSize: 24, fontWeight: FontWeight.w700),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Tu gasto en algunas etiquetas subio esta semana. Si rediriges parte del flujo a ahorro, podrias mejorar tu balance neto mensual.',
+            style: TextStyle(color: AppTheme.onSurfaceMuted, height: 1.4),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GlassCard extends StatelessWidget {
+  const _GlassCard({required this.child});
+
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(24),
+        color: AppTheme.surfaceHigh.withValues(alpha: 0.7),
       ),
-      child: Text(message),
+      child: child,
     );
   }
 }
