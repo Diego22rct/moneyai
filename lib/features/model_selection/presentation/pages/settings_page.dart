@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moneyai/features/model_selection/domain/entities/model_option.dart';
+import 'package:moneyai/features/model_selection/presentation/pages/llama_model_download_page.dart';
 import 'package:moneyai/features/model_selection/presentation/providers/model_selector_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -10,8 +11,6 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final activeNlu = ref.watch(activeNluModelProvider);
     final nluModelPath = ref.watch(nluModelPathProvider);
-    final nluLibPath = ref.watch(nluNativeLibPathProvider);
-    final runtimeConfigState = ref.watch(modelRuntimeConfigControllerProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Configuracion de Modelos')),
@@ -50,24 +49,28 @@ class SettingsPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   _RuntimeConfigCard(
-                    title: 'Configurar Llama local',
-                    subtitle: _buildLlamaSubtitle(
-                      modelPath: nluModelPath,
-                      libPath: nluLibPath,
-                    ),
-                    onTap: () => _showLlamaConfigDialog(
-                      context,
-                      ref,
-                      initialModelPath: nluModelPath.valueOrNull,
-                      initialLibPath: nluLibPath.valueOrNull,
-                    ),
+                    title: 'Descargar modelo Llama',
+                    subtitle: _buildLlamaSubtitle(modelPath: nluModelPath),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (context) => const LlamaModelDownloadPage(),
+                        ),
+                      );
+                      return;
+                    },
                   ),
-                  if (runtimeConfigState.hasError)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'La app buscara y descargara modelos GGUF desde Hugging Face para activar llama_local automaticamente.',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  if (nluModelPath.valueOrNull?.trim().isNotEmpty == true)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 8),
                       child: Text(
-                        'No se pudo guardar la configuracion runtime.',
-                        style: TextStyle(color: Theme.of(context).colorScheme.error),
+                        'Puedes cambiar de modelo cuando quieras desde este mismo flujo.',
+                        style: TextStyle(fontSize: 12),
                       ),
                     ),
                 ],
@@ -79,106 +82,12 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  String _buildLlamaSubtitle({
-    required AsyncValue<String?> modelPath,
-    required AsyncValue<String?> libPath,
-  }) {
+  String _buildLlamaSubtitle({required AsyncValue<String?> modelPath}) {
     final String ggufPath = modelPath.valueOrNull?.trim().isNotEmpty == true
         ? modelPath.valueOrNull!
         : 'No configurada';
-    final String nativePath = libPath.valueOrNull?.trim().isNotEmpty == true
-        ? libPath.valueOrNull!
-        : 'Auto';
 
-    return 'Modelo GGUF: $ggufPath\nLibreria nativa: $nativePath';
-  }
-
-
-  Future<void> _showLlamaConfigDialog(
-    BuildContext context,
-    WidgetRef ref, {
-    required String? initialModelPath,
-    required String? initialLibPath,
-  }) async {
-    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-    final TextEditingController modelPathController =
-        TextEditingController(text: initialModelPath ?? '');
-    final TextEditingController libPathController = TextEditingController(text: initialLibPath ?? '');
-
-    final bool? accepted = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Llama local'),
-          content: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextFormField(
-                  controller: modelPathController,
-                  decoration: const InputDecoration(
-                    labelText: 'Ruta del modelo GGUF',
-                    hintText: 'Ej: /storage/emulated/.../modelo.gguf',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'La ruta del modelo GGUF es obligatoria.';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: libPathController,
-                  decoration: const InputDecoration(
-                    labelText: 'Ruta libreria nativa (opcional)',
-                    hintText: 'Si esta vacio, se usa resolucion por defecto del paquete',
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
-            ),
-            FilledButton(
-              onPressed: () {
-                if (formKey.currentState!.validate()) {
-                  Navigator.of(context).pop(true);
-                }
-              },
-              child: const Text('Guardar'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (accepted != true) {
-      modelPathController.dispose();
-      libPathController.dispose();
-      return;
-    }
-
-    await ref.read(modelRuntimeConfigControllerProvider.notifier).setModelPath(
-          task: AiTask.nlu,
-          path: modelPathController.text,
-        );
-    await ref
-        .read(modelRuntimeConfigControllerProvider.notifier)
-        .setNluNativeLibPath(libPathController.text);
-
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Configuracion de Llama guardada.')),
-      );
-    }
-
-    modelPathController.dispose();
-    libPathController.dispose();
+    return 'Modelo GGUF activo:\n$ggufPath';
   }
 }
 
