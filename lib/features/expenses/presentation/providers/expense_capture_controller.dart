@@ -43,7 +43,7 @@ class ExpenseCaptureController extends StateNotifier<ExpenseCaptureState> {
     if (cleaned.isEmpty) {
       state = state.copyWith(
         status: CaptureStatus.error,
-        message: 'Ingresa un gasto para procesar.',
+        message: 'Ingresa un movimiento para procesar.',
       );
       return;
     }
@@ -53,9 +53,10 @@ class ExpenseCaptureController extends StateNotifier<ExpenseCaptureState> {
     try {
       final expense = await _ref.read(recordTextExpenseProvider).call(cleaned);
       await _ref.read(expenseListProvider.notifier).refreshList();
+      final String kind = expense.type == TransactionType.income ? 'Ingreso' : 'Gasto';
       state = state.copyWith(
         status: CaptureStatus.success,
-        message: 'Gasto registrado correctamente.',
+        message: '$kind registrado correctamente.',
         lastSaved: expense,
       );
     } on FormatException catch (error) {

@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:moneyai/features/expenses/domain/entities/expense.dart';
 import 'package:moneyai/features/expenses/presentation/providers/expense_capture_controller.dart';
 import 'package:moneyai/features/expenses/presentation/providers/expense_list_provider.dart';
+import 'package:moneyai/features/expenses/presentation/providers/voice_input_controller.dart';
+import 'package:moneyai/features/model_selection/presentation/pages/settings_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -24,11 +26,25 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final captureState = ref.watch(expenseCaptureControllerProvider);
+    final voiceState = ref.watch(voiceInputControllerProvider);
     final expensesState = ref.watch(expenseListProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('MoneyAI'),
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => const SettingsPage(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.tune),
+            tooltip: 'Modelos IA',
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -38,41 +54,72 @@ class _HomePageState extends ConsumerState<HomePage> {
               TextField(
                 controller: _textController,
                 decoration: const InputDecoration(
-                  labelText: 'Describe tu gasto',
-                  hintText: 'Ej: Gaste 35 soles en almuerzo',
+                  labelText: 'Describe tu gasto o ingreso',
+                  hintText: 'Ej: Me pagaron 1200 de salario',
                   border: OutlineInputBorder(),
                 ),
                 minLines: 1,
                 maxLines: 2,
               ),
               const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: captureState.status == CaptureStatus.loading
-                      ? null
-                      : () async {
-                          await ref
-                              .read(expenseCaptureControllerProvider.notifier)
-                              .submitText(_textController.text);
-                          if (mounted &&
-                              ref
-                                      .read(expenseCaptureControllerProvider)
-                                      .status ==
-                                  CaptureStatus.success) {
-                            _textController.clear();
-                          }
-                        },
-                  child: captureState.status == CaptureStatus.loading
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('Procesar y guardar'),
-                ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: captureState.status == CaptureStatus.loading
+                          ? null
+                          : () async {
+                              await ref
+                                  .read(expenseCaptureControllerProvider.notifier)
+                                  .submitText(_textController.text);
+                              if (mounted &&
+                                  ref
+                                          .read(expenseCaptureControllerProvider)
+                                          .status ==
+                                      CaptureStatus.success) {
+                                _textController.clear();
+                              }
+                            },
+                      child: captureState.status == CaptureStatus.loading
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Procesar movimiento'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  IconButton.filledTonal(
+                    onPressed: () async {
+                      await ref.read(voiceInputControllerProvider.notifier).toggleListening(
+                            onText: (text) {
+                              _textController.text = text;
+                              _textController.selection = TextSelection.fromPosition(
+                                TextPosition(offset: _textController.text.length),
+                              );
+                            },
+                          );
+                    },
+                    icon: Icon(voiceState.isListening ? Icons.stop : Icons.mic),
+                    tooltip: voiceState.isListening ? 'Detener voz' : 'Hablar',
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
+              if (voiceState.isListening)
+                const _ListeningBadge()
+              else
+                const SizedBox.shrink(),
+              if (voiceState.errorMessage != null)
+                _CaptureFeedback(
+                  message: voiceState.errorMessage,
+                  status: CaptureStatus.error,
+                )
+              else
+                const SizedBox.shrink(),
+              if (voiceState.isListening || voiceState.errorMessage != null)
+                const SizedBox(height: 12),
               _CaptureFeedback(message: captureState.message, status: captureState.status),
               const SizedBox(height: 12),
               Expanded(
@@ -148,6 +195,7 @@ class ExpenseTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isIncome = expense.type == TransactionType.income;
     final NumberFormat amountFormat = NumberFormat.currency(
       locale: 'es_PE',
       symbol: '${expense.currency} ',
@@ -156,12 +204,64 @@ class ExpenseTile extends StatelessWidget {
 
     return Card(
       child: ListTile(
-        title: Text(amountFormat.format(expense.amount)),
-        subtitle: Text('${expense.category} - ${expense.description}'),
-        trailing: Text(
-          DateFormat('dd/MM HH:mm').format(expense.timestamp.toLocal()),
-          style: Theme.of(context).textTheme.bodySmall,
+        title: Text(
+          amountFormat.format(expense.amount),
+          style: TextStyle(
+            color: isIncome ? Colors.green.shade700 : Colors.red.shade700,
+            fontWeight: FontWeight.w600,
+          ),
         ),
+        subtitle: Text('${expense.category} - ${expense.description}'),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: (isIncome ? Colors.green : Colors.red).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                isIncome ? 'Ingreso' : 'Gasto',
+                style: TextStyle(
+                  color: isIncome ? Colors.green.shade800 : Colors.red.shade800,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              DateFormat('dd/MM HH:mm').format(expense.timestamp.toLocal()),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ListeningBadge extends StatelessWidget {
+  const _ListeningBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.blue.withValues(alpha: 0.08),
+        border: Border.all(color: Colors.blue.withValues(alpha: 0.35)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Row(
+        children: <Widget>[
+          Icon(Icons.graphic_eq, size: 18, color: Colors.blue),
+          SizedBox(width: 8),
+          Text('Escuchando... habla ahora'),
+        ],
       ),
     );
   }

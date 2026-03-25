@@ -7,3 +7,12 @@ const List<String> kExpenseCategories = <String>[
   'Hogar',
   'Otros',
 ];
+
+const List<String> kIncomeCategories = <String>[
+  'Salario',
+  'Freelance',
+  'Inversiones',
+  'Regalos',
+  'Reembolsos',
+  'Otros Ingresos',
+];

@@ -8,7 +8,7 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: MoneyAiApp()));
 
     expect(find.text('MoneyAI'), findsOneWidget);
-    expect(find.text('Procesar y guardar'), findsOneWidget);
-    expect(find.text('Describe tu gasto'), findsOneWidget);
+    expect(find.text('Procesar movimiento'), findsOneWidget);
+    expect(find.text('Describe tu gasto o ingreso'), findsOneWidget);
   });
 }

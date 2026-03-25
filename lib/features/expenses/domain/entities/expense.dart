@@ -1,8 +1,11 @@
+enum TransactionType { expense, income }
+
 class Expense {
   const Expense({
     this.id,
     required this.amount,
     required this.currency,
+    required this.type,
     required this.description,
     required this.category,
     required this.timestamp,
@@ -11,6 +14,7 @@ class Expense {
   final int? id;
   final double amount;
   final String currency;
+  final TransactionType type;
   final String description;
   final String category;
   final DateTime timestamp;
@@ -19,6 +23,7 @@ class Expense {
     int? id,
     double? amount,
     String? currency,
+    TransactionType? type,
     String? description,
     String? category,
     DateTime? timestamp,
@@ -27,6 +32,7 @@ class Expense {
       id: id ?? this.id,
       amount: amount ?? this.amount,
       currency: currency ?? this.currency,
+      type: type ?? this.type,
       description: description ?? this.description,
       category: category ?? this.category,
       timestamp: timestamp ?? this.timestamp,
@@ -38,6 +44,7 @@ class Expense {
       'id': id,
       'amount': amount,
       'currency': currency,
+      'type': type.name,
       'description': description,
       'category': category,
       'timestamp': timestamp.toIso8601String(),
@@ -45,10 +52,16 @@ class Expense {
   }
 
   factory Expense.fromMap(Map<String, Object?> map) {
+    final String typeValue = (map['type'] as String?) ?? TransactionType.expense.name;
+
     return Expense(
       id: map['id'] as int?,
       amount: (map['amount'] as num).toDouble(),
       currency: map['currency'] as String,
+      type: TransactionType.values.firstWhere(
+        (value) => value.name == typeValue,
+        orElse: () => TransactionType.expense,
+      ),
       description: map['description'] as String,
       category: map['category'] as String,
       timestamp: DateTime.parse(map['timestamp'] as String),
