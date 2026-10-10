@@ -27,7 +27,7 @@ class LocalSttService implements SttService {
     }
 
     await _speechToText.listen(
-      localeId: 'es_PE',
+      listenOptions: SpeechListenOptions(localeId: 'es_PE'),
       onResult: (result) {
         if (result.recognizedWords.isNotEmpty) {
           onText(result.recognizedWords);
