@@ -75,8 +75,8 @@ class ExpenseCaptureState {
 
 final expenseCaptureControllerProvider =
     StateNotifierProvider<ExpenseCaptureController, ExpenseCaptureState>(
-  (ref) => ExpenseCaptureController(ref),
-);
+      (ref) => ExpenseCaptureController(ref),
+    );
 
 class ExpenseCaptureController extends StateNotifier<ExpenseCaptureState> {
   ExpenseCaptureController(this._ref) : super(const ExpenseCaptureState());
@@ -93,10 +93,16 @@ class ExpenseCaptureController extends StateNotifier<ExpenseCaptureState> {
       return;
     }
 
-    state = state.copyWith(status: CaptureStatus.loading, message: null, clearDraft: true);
+    state = state.copyWith(
+      status: CaptureStatus.loading,
+      message: null,
+      clearDraft: true,
+    );
 
     try {
-      final expense = await _ref.read(expenseRepositoryProvider).analyzeMovementFromText(cleaned);
+      final expense = await _ref
+          .read(expenseRepositoryProvider)
+          .analyzeMovementFromText(cleaned);
       final List<String> suggested = _buildSuggestedTags(expense);
 
       state = state.copyWith(
@@ -165,7 +171,9 @@ class ExpenseCaptureController extends StateNotifier<ExpenseCaptureState> {
     }
 
     final List<String> tags = List<String>.from(draft.selectedTags);
-    final int index = tags.indexWhere((value) => value.toLowerCase() == cleaned.toLowerCase());
+    final int index = tags.indexWhere(
+      (value) => value.toLowerCase() == cleaned.toLowerCase(),
+    );
 
     if (index >= 0) {
       tags.removeAt(index);
@@ -191,15 +199,17 @@ class ExpenseCaptureController extends StateNotifier<ExpenseCaptureState> {
       return;
     }
 
-    final bool alreadyExists = draft.suggestedTags
-        .any((value) => value.toLowerCase() == cleaned.toLowerCase());
+    final bool alreadyExists = draft.suggestedTags.any(
+      (value) => value.toLowerCase() == cleaned.toLowerCase(),
+    );
 
     final List<String> suggested = alreadyExists
         ? List<String>.from(draft.suggestedTags)
         : <String>[...draft.suggestedTags, cleaned];
 
-    final bool alreadySelected = draft.selectedTags
-        .any((value) => value.toLowerCase() == cleaned.toLowerCase());
+    final bool alreadySelected = draft.selectedTags.any(
+      (value) => value.toLowerCase() == cleaned.toLowerCase(),
+    );
 
     final List<String> selected = alreadySelected
         ? List<String>.from(draft.selectedTags)
@@ -235,7 +245,10 @@ class ExpenseCaptureController extends StateNotifier<ExpenseCaptureState> {
       return;
     }
 
-    state = state.copyWith(status: CaptureStatus.loading, message: 'Registrando movimiento...');
+    state = state.copyWith(
+      status: CaptureStatus.loading,
+      message: 'Registrando movimiento...',
+    );
 
     try {
       final Expense expense = Expense(
@@ -248,10 +261,14 @@ class ExpenseCaptureController extends StateNotifier<ExpenseCaptureState> {
         timestamp: draft.timestamp,
       );
 
-      final Expense saved = await _ref.read(expenseRepositoryProvider).saveMovement(expense);
+      final Expense saved = await _ref
+          .read(expenseRepositoryProvider)
+          .saveMovement(expense);
       await _ref.read(expenseListProvider.notifier).refreshList();
 
-      final String kind = saved.type == TransactionType.income ? 'Ingreso' : 'Gasto';
+      final String kind = saved.type == TransactionType.income
+          ? 'Ingreso'
+          : 'Gasto';
       state = state.copyWith(
         status: CaptureStatus.success,
         message: '$kind registrado correctamente.',
@@ -285,10 +302,17 @@ class ExpenseCaptureController extends StateNotifier<ExpenseCaptureState> {
       expense.type == TransactionType.income ? 'Ingreso' : 'Gasto',
     };
 
-    return base.map((value) => value.trim()).where((value) => value.isNotEmpty).toList();
+    return base
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty)
+        .toList();
   }
 
   void resetStatus() {
-    state = state.copyWith(status: CaptureStatus.idle, message: null, clearDraft: true);
+    state = state.copyWith(
+      status: CaptureStatus.idle,
+      message: null,
+      clearDraft: true,
+    );
   }
 }

@@ -39,13 +39,16 @@ class DashboardPage extends ConsumerWidget {
                 Text(
                   amountFormat.format(summary.net),
                   style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.onSurface,
-                      ),
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.onSurface,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 7,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(999),
                     color: AppTheme.secondary.withValues(alpha: 0.12),
@@ -74,11 +77,15 @@ class DashboardPage extends ConsumerWidget {
         const SizedBox(height: 12),
         SizedBox(
           height: 178,
-          child: ref.watch(tagRankingProvider).when(
+          child: ref
+              .watch(tagRankingProvider)
+              .when(
                 data: (tags) {
                   if (tags.isEmpty) {
                     return const _GlassCard(
-                      child: Center(child: Text('Aun no hay movimientos para mostrar.')),
+                      child: Center(
+                        child: Text('Aun no hay movimientos para mostrar.'),
+                      ),
                     );
                   }
 
@@ -86,10 +93,13 @@ class DashboardPage extends ConsumerWidget {
                   return ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: top.length,
-                    separatorBuilder: (context, index) => const SizedBox(width: 12),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 12),
                     itemBuilder: (context, index) {
                       final item = top[index];
-                      final Color accent = index.isEven ? AppTheme.primary : AppTheme.secondary;
+                      final Color accent = index.isEven
+                          ? AppTheme.primary
+                          : AppTheme.secondary;
                       return _FlowCard(
                         title: item.tag,
                         amount: amountFormat.format(item.amount),
@@ -150,12 +160,16 @@ class _SectionHeader extends StatelessWidget {
       children: <Widget>[
         Text(
           title,
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
         ),
         Text(
           action,
           style: TextStyle(
-            color: action == 'View Insights' ? AppTheme.primary : AppTheme.onSurfaceMuted,
+            color: action == 'View Insights'
+                ? AppTheme.primary
+                : AppTheme.onSurfaceMuted,
             fontSize: 12,
             letterSpacing: 0.7,
           ),
@@ -217,7 +231,10 @@ class _FlowCard extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     amount,
-                    style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w700),
+                    style: const TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -268,10 +285,16 @@ class _LedgerTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(expense.description, maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(
+                  expense.description,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 const SizedBox(height: 2),
                 Text(
-                  DateFormat('dd MMM, HH:mm').format(expense.timestamp.toLocal()),
+                  DateFormat(
+                    'dd MMM, HH:mm',
+                  ).format(expense.timestamp.toLocal()),
                   style: const TextStyle(color: AppTheme.onSurfaceMuted),
                 ),
               ],
@@ -316,7 +339,11 @@ class _InsightCard extends StatelessWidget {
         children: <Widget>[
           Text(
             'Ethereal Insight',
-            style: TextStyle(color: AppTheme.primary, fontSize: 24, fontWeight: FontWeight.w700),
+            style: TextStyle(
+              color: AppTheme.primary,
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           SizedBox(height: 8),
           Text(

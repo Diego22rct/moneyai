@@ -10,10 +10,12 @@ class ReviewInterpretationPage extends ConsumerStatefulWidget {
   const ReviewInterpretationPage({super.key});
 
   @override
-  ConsumerState<ReviewInterpretationPage> createState() => _ReviewInterpretationPageState();
+  ConsumerState<ReviewInterpretationPage> createState() =>
+      _ReviewInterpretationPageState();
 }
 
-class _ReviewInterpretationPageState extends ConsumerState<ReviewInterpretationPage> {
+class _ReviewInterpretationPageState
+    extends ConsumerState<ReviewInterpretationPage> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _tagController = TextEditingController();
 
@@ -51,9 +53,7 @@ class _ReviewInterpretationPageState extends ConsumerState<ReviewInterpretationP
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Revision de interpretacion'),
-      ),
+      appBar: AppBar(title: const Text('Revision de interpretacion')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -70,7 +70,10 @@ class _ReviewInterpretationPageState extends ConsumerState<ReviewInterpretationP
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('Monto detectado', style: Theme.of(context).textTheme.labelLarge),
+                      Text(
+                        'Monto detectado',
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
                       const SizedBox(height: 4),
                       Text(
                         amountFormat.format(draft.amount),
@@ -102,7 +105,9 @@ class _ReviewInterpretationPageState extends ConsumerState<ReviewInterpretationP
                 selected: <TransactionType>{draft.type},
                 onSelectionChanged: (selection) {
                   final selected = selection.first;
-                  ref.read(expenseCaptureControllerProvider.notifier).updateDraftType(selected);
+                  ref
+                      .read(expenseCaptureControllerProvider.notifier)
+                      .updateDraftType(selected);
                 },
               ),
               const SizedBox(height: 12),
@@ -115,7 +120,9 @@ class _ReviewInterpretationPageState extends ConsumerState<ReviewInterpretationP
                   border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
-                  ref.read(expenseCaptureControllerProvider.notifier).updateDraftDescription(value);
+                  ref
+                      .read(expenseCaptureControllerProvider.notifier)
+                      .updateDraftDescription(value);
                 },
               ),
               const SizedBox(height: 12),
@@ -125,12 +132,15 @@ class _ReviewInterpretationPageState extends ConsumerState<ReviewInterpretationP
                 spacing: 8,
                 runSpacing: 8,
                 children: draft.suggestedTags.map((tag) {
-                  final bool selected = draft.selectedTags
-                      .any((value) => value.toLowerCase() == tag.toLowerCase());
+                  final bool selected = draft.selectedTags.any(
+                    (value) => value.toLowerCase() == tag.toLowerCase(),
+                  );
                   return FilterChip(
                     selected: selected,
                     onSelected: (_) {
-                      ref.read(expenseCaptureControllerProvider.notifier).toggleTag(tag);
+                      ref
+                          .read(expenseCaptureControllerProvider.notifier)
+                          .toggleTag(tag);
                     },
                     label: Text(tag),
                   );
@@ -159,7 +169,9 @@ class _ReviewInterpretationPageState extends ConsumerState<ReviewInterpretationP
               ),
               const SizedBox(height: 16),
               if (voiceState.isListening)
-                const _InlineInfoCard(message: 'Escuchando... toca detener y luego Analizar.'),
+                const _InlineInfoCard(
+                  message: 'Escuchando... toca detener y luego Analizar.',
+                ),
               if (state.message != null && state.status == CaptureStatus.error)
                 _InlineErrorCard(message: state.message!),
               const SizedBox(height: 10),
@@ -168,18 +180,26 @@ class _ReviewInterpretationPageState extends ConsumerState<ReviewInterpretationP
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () async {
-                        await ref.read(voiceInputControllerProvider.notifier).toggleListening(
+                        await ref
+                            .read(voiceInputControllerProvider.notifier)
+                            .toggleListening(
                               onText: (text) {
                                 _descriptionController.text = text;
                                 ref
-                                    .read(expenseCaptureControllerProvider.notifier)
+                                    .read(
+                                      expenseCaptureControllerProvider.notifier,
+                                    )
                                     .updateDraftDescription(text);
                               },
                             );
                       },
-                      icon: Icon(voiceState.isListening ? Icons.stop : Icons.mic),
+                      icon: Icon(
+                        voiceState.isListening ? Icons.stop : Icons.mic,
+                      ),
                       label: Text(
-                        voiceState.isListening ? 'Detener grabacion' : 'Volver a grabar voz',
+                        voiceState.isListening
+                            ? 'Detener grabacion'
+                            : 'Volver a grabar voz',
                       ),
                     ),
                   ),
@@ -190,7 +210,9 @@ class _ReviewInterpretationPageState extends ConsumerState<ReviewInterpretationP
                         await ref
                             .read(expenseCaptureControllerProvider.notifier)
                             .submitText(_descriptionController.text);
-                        final updated = ref.read(expenseCaptureControllerProvider).pendingDraft;
+                        final updated = ref
+                            .read(expenseCaptureControllerProvider)
+                            .pendingDraft;
                         if (updated != null) {
                           _descriptionController.text = updated.description;
                         }
@@ -207,7 +229,9 @@ class _ReviewInterpretationPageState extends ConsumerState<ReviewInterpretationP
                   Expanded(
                     child: TextButton(
                       onPressed: () {
-                        ref.read(expenseCaptureControllerProvider.notifier).discardDraft();
+                        ref
+                            .read(expenseCaptureControllerProvider.notifier)
+                            .discardDraft();
                         Navigator.of(context).pop();
                       },
                       child: const Text('Cancelar'),
@@ -219,18 +243,26 @@ class _ReviewInterpretationPageState extends ConsumerState<ReviewInterpretationP
                       onPressed: state.status == CaptureStatus.loading
                           ? null
                           : () async {
-                              await ref.read(expenseCaptureControllerProvider.notifier).confirmDraft();
+                              await ref
+                                  .read(
+                                    expenseCaptureControllerProvider.notifier,
+                                  )
+                                  .confirmDraft();
                               if (!context.mounted) {
                                 return;
                               }
-                              final updated = ref.read(expenseCaptureControllerProvider);
+                              final updated = ref.read(
+                                expenseCaptureControllerProvider,
+                              );
                               if (updated.status == CaptureStatus.success) {
                                 Navigator.of(context).pop();
                               }
                             },
                       icon: const Icon(Icons.check),
                       label: Text(
-                        state.status == CaptureStatus.loading ? 'Registrando...' : 'Registrar',
+                        state.status == CaptureStatus.loading
+                            ? 'Registrando...'
+                            : 'Registrar',
                       ),
                     ),
                   ),

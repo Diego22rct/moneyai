@@ -8,52 +8,67 @@ final sqliteServiceForModelProvider = Provider<SQLiteService>((ref) {
   return SQLiteService();
 });
 
-final modelConfigLocalDataSourceProvider = Provider<ModelConfigLocalDataSource>((ref) {
-  return ModelConfigLocalDataSource(ref.watch(sqliteServiceForModelProvider));
-});
+final modelConfigLocalDataSourceProvider = Provider<ModelConfigLocalDataSource>(
+  (ref) {
+    return ModelConfigLocalDataSource(ref.watch(sqliteServiceForModelProvider));
+  },
+);
 
-final aiRuntimeConfigLocalDataSourceProvider = Provider<AiRuntimeConfigLocalDataSource>((ref) {
-  return AiRuntimeConfigLocalDataSource(ref.watch(sqliteServiceForModelProvider));
-});
+final aiRuntimeConfigLocalDataSourceProvider =
+    Provider<AiRuntimeConfigLocalDataSource>((ref) {
+      return AiRuntimeConfigLocalDataSource(
+        ref.watch(sqliteServiceForModelProvider),
+      );
+    });
 
 final activeSttModelProvider = FutureProvider<String>((ref) async {
-  return ref.read(modelConfigLocalDataSourceProvider).getActiveModelId(AiTask.stt);
+  return ref
+      .read(modelConfigLocalDataSourceProvider)
+      .getActiveModelId(AiTask.stt);
 });
 
 final activeNluModelProvider = FutureProvider<String>((ref) async {
-  return ref.read(modelConfigLocalDataSourceProvider).getActiveModelId(AiTask.nlu);
+  return ref
+      .read(modelConfigLocalDataSourceProvider)
+      .getActiveModelId(AiTask.nlu);
 });
 
 final nluModelPathProvider = FutureProvider<String?>((ref) async {
-  return ref.read(aiRuntimeConfigLocalDataSourceProvider).getModelPath(AiTask.nlu);
+  return ref
+      .read(aiRuntimeConfigLocalDataSourceProvider)
+      .getModelPath(AiTask.nlu);
 });
 
 final nluNativeLibPathProvider = FutureProvider<String?>((ref) async {
-  return ref.read(aiRuntimeConfigLocalDataSourceProvider).getNativeLibPath(AiTask.nlu);
+  return ref
+      .read(aiRuntimeConfigLocalDataSourceProvider)
+      .getNativeLibPath(AiTask.nlu);
 });
 
 final modelSelectionControllerProvider =
     StateNotifierProvider<ModelSelectionController, AsyncValue<void>>(
-  (ref) => ModelSelectionController(ref),
-);
+      (ref) => ModelSelectionController(ref),
+    );
 
 final modelRuntimeConfigControllerProvider =
     StateNotifierProvider<ModelRuntimeConfigController, AsyncValue<void>>(
-  (ref) => ModelRuntimeConfigController(ref),
-);
+      (ref) => ModelRuntimeConfigController(ref),
+    );
 
 class ModelSelectionController extends StateNotifier<AsyncValue<void>> {
   ModelSelectionController(this._ref) : super(const AsyncValue.data(null));
 
   final Ref _ref;
 
-  Future<void> selectModel({required AiTask task, required String modelId}) async {
+  Future<void> selectModel({
+    required AiTask task,
+    required String modelId,
+  }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await _ref.read(modelConfigLocalDataSourceProvider).setActiveModel(
-            task: task,
-            modelId: modelId,
-          );
+      await _ref
+          .read(modelConfigLocalDataSourceProvider)
+          .setActiveModel(task: task, modelId: modelId);
 
       if (task == AiTask.stt) {
         _ref.invalidate(activeSttModelProvider);
@@ -69,13 +84,15 @@ class ModelRuntimeConfigController extends StateNotifier<AsyncValue<void>> {
 
   final Ref _ref;
 
-  Future<void> setModelPath({required AiTask task, required String? path}) async {
+  Future<void> setModelPath({
+    required AiTask task,
+    required String? path,
+  }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await _ref.read(aiRuntimeConfigLocalDataSourceProvider).setModelPath(
-            task: task,
-            path: path,
-          );
+      await _ref
+          .read(aiRuntimeConfigLocalDataSourceProvider)
+          .setModelPath(task: task, path: path);
 
       if (task == AiTask.nlu) {
         _ref.invalidate(nluModelPathProvider);
@@ -86,10 +103,9 @@ class ModelRuntimeConfigController extends StateNotifier<AsyncValue<void>> {
   Future<void> setNluNativeLibPath(String? path) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await _ref.read(aiRuntimeConfigLocalDataSourceProvider).setNativeLibPath(
-            task: AiTask.nlu,
-            path: path,
-          );
+      await _ref
+          .read(aiRuntimeConfigLocalDataSourceProvider)
+          .setNativeLibPath(task: AiTask.nlu, path: path);
 
       _ref.invalidate(nluNativeLibPathProvider);
     });

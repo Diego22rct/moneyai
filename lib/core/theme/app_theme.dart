@@ -15,11 +15,11 @@ class AppTheme {
   static const Color onSurfaceMuted = Color(0xFFBBCABF);
   static const Color danger = Color(0xFFFFB4AB);
 
-    static LinearGradient get neonPrimaryGradient => const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      colors: <Color>[Color(0xFF4EDEA3), Color(0xFF10B981)],
-      );
+  static LinearGradient get neonPrimaryGradient => const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: <Color>[Color(0xFF4EDEA3), Color(0xFF10B981)],
+  );
 
   static ThemeData darkTheme() {
     final ColorScheme scheme = ColorScheme.fromSeed(
@@ -32,10 +32,7 @@ class AppTheme {
 
     final TextTheme baseText = GoogleFonts.manropeTextTheme(
       ThemeData(brightness: Brightness.dark).textTheme,
-    ).apply(
-      bodyColor: onSurface,
-      displayColor: onSurface,
-    );
+    ).apply(bodyColor: onSurface, displayColor: onSurface);
 
     final TextTheme textTheme = baseText.copyWith(
       labelSmall: GoogleFonts.manrope(
@@ -78,7 +75,9 @@ class AppTheme {
         indicatorColor: primary.withValues(alpha: 0.2),
         labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>(
           (states) => GoogleFonts.inter(
-            color: states.contains(WidgetState.selected) ? primary : onSurfaceMuted,
+            color: states.contains(WidgetState.selected)
+                ? primary
+                : onSurfaceMuted,
             fontSize: 12,
             fontWeight: FontWeight.w500,
             letterSpacing: 0.3,
@@ -88,7 +87,9 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: surfaceHigh.withValues(alpha: 0.65),
-        hintStyle: GoogleFonts.manrope(color: onSurfaceMuted.withValues(alpha: 0.9)),
+        hintStyle: GoogleFonts.manrope(
+          color: onSurfaceMuted.withValues(alpha: 0.9),
+        ),
         labelStyle: GoogleFonts.manrope(color: onSurfaceMuted),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
@@ -100,7 +101,10 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(color: primary.withValues(alpha: 0.65), width: 2),
+          borderSide: BorderSide(
+            color: primary.withValues(alpha: 0.65),
+            width: 2,
+          ),
         ),
       ),
       chipTheme: ChipThemeData(

@@ -17,7 +17,9 @@ class ModelConfigLocalDataSource {
     );
 
     if (rows.isEmpty) {
-      final String fallback = task == AiTask.stt ? 'speech_to_text' : 'regex_local';
+      final String fallback = task == AiTask.stt
+          ? 'speech_to_text'
+          : 'regex_local';
       await setActiveModel(task: task, modelId: fallback);
       return fallback;
     }
@@ -25,7 +27,10 @@ class ModelConfigLocalDataSource {
     return rows.first['model_id']! as String;
   }
 
-  Future<void> setActiveModel({required AiTask task, required String modelId}) async {
+  Future<void> setActiveModel({
+    required AiTask task,
+    required String modelId,
+  }) async {
     final db = await _sqliteService.database;
 
     await db.transaction((txn) async {

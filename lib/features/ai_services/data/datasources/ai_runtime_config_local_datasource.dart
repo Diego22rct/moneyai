@@ -12,12 +12,13 @@ class AiRuntimeConfigLocalDataSource {
     return row?['model_path'] as String?;
   }
 
-  Future<void> setModelPath({required AiTask task, required String? path}) async {
+  Future<void> setModelPath({
+    required AiTask task,
+    required String? path,
+  }) async {
     await _upsertTaskConfig(
       task: task,
-      values: <String, Object?>{
-        'model_path': _normalizeNullable(path),
-      },
+      values: <String, Object?>{'model_path': _normalizeNullable(path)},
     );
   }
 
@@ -26,12 +27,13 @@ class AiRuntimeConfigLocalDataSource {
     return row?['native_lib_path'] as String?;
   }
 
-  Future<void> setNativeLibPath({required AiTask task, required String? path}) async {
+  Future<void> setNativeLibPath({
+    required AiTask task,
+    required String? path,
+  }) async {
     await _upsertTaskConfig(
       task: task,
-      values: <String, Object?>{
-        'native_lib_path': _normalizeNullable(path),
-      },
+      values: <String, Object?>{'native_lib_path': _normalizeNullable(path)},
     );
   }
 

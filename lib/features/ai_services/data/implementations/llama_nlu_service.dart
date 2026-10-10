@@ -44,7 +44,9 @@ class LlamaNluService implements NluService {
       );
     }
 
-    final String? nativeLibPath = await _runtimeConfig.getNativeLibPath(AiTask.nlu);
+    final String? nativeLibPath = await _runtimeConfig.getNativeLibPath(
+      AiTask.nlu,
+    );
     if (nativeLibPath != null && nativeLibPath.trim().isNotEmpty) {
       Llama.libraryPath = nativeLibPath;
     }
@@ -82,12 +84,16 @@ Texto del usuario: "$userText"
     final RegExp jsonObjectExp = RegExp(r'\{[\s\S]*\}');
     final RegExpMatch? match = jsonObjectExp.firstMatch(raw);
     if (match == null) {
-      throw const FormatException('La respuesta del modelo no contiene JSON valido.');
+      throw const FormatException(
+        'La respuesta del modelo no contiene JSON valido.',
+      );
     }
 
     final dynamic decoded = jsonDecode(match.group(0)!);
     if (decoded is! Map<String, dynamic>) {
-      throw const FormatException('La respuesta del modelo no tiene el formato esperado.');
+      throw const FormatException(
+        'La respuesta del modelo no tiene el formato esperado.',
+      );
     }
 
     final num? amountNum = decoded['amount'] as num?;
@@ -107,7 +113,9 @@ Texto del usuario: "$userText"
     }
 
     if (type != 'expense' && type != 'income') {
-      throw const FormatException('La respuesta del modelo tiene un tipo invalido.');
+      throw const FormatException(
+        'La respuesta del modelo tiene un tipo invalido.',
+      );
     }
 
     DateTime.parse(timestamp);

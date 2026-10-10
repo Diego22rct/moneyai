@@ -9,15 +9,21 @@ class LocalSttService implements SttService {
   bool get isListening => _speechToText.isListening;
 
   @override
-  Future<void> startListening({required void Function(String text) onText}) async {
+  Future<void> startListening({
+    required void Function(String text) onText,
+  }) async {
     final permission = await Permission.microphone.request();
     if (!permission.isGranted) {
-      throw const FormatException('Debes habilitar el permiso de microfono para usar voz.');
+      throw const FormatException(
+        'Debes habilitar el permiso de microfono para usar voz.',
+      );
     }
 
     final bool available = await _speechToText.initialize();
     if (!available) {
-      throw const FormatException('No se pudo iniciar el reconocimiento de voz en el dispositivo.');
+      throw const FormatException(
+        'No se pudo iniciar el reconocimiento de voz en el dispositivo.',
+      );
     }
 
     await _speechToText.listen(

@@ -31,7 +31,10 @@ class _TagsPageState extends ConsumerState<TagsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text('Ranking de etiquetas', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Ranking de etiquetas',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 8),
             Expanded(
               child: rankingState.when(
@@ -49,7 +52,8 @@ class _TagsPageState extends ConsumerState<TagsPage> {
                       Expanded(
                         child: ListView.separated(
                           itemCount: ranking.length,
-                          separatorBuilder: (context, index) => const SizedBox(height: 8),
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 8),
                           itemBuilder: (context, index) {
                             final TagTotal item = ranking[index];
                             final bool selected = item.tag == activeTag;
@@ -66,25 +70,29 @@ class _TagsPageState extends ConsumerState<TagsPage> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(14),
                                   color: selected
-                                      ? Theme.of(context)
-                                          .colorScheme
-                                          .primary
-                                          .withValues(alpha: 0.12)
-                                      : Theme.of(context).colorScheme.surfaceContainer,
+                                      ? Theme.of(context).colorScheme.primary
+                                            .withValues(alpha: 0.12)
+                                      : Theme.of(
+                                          context,
+                                        ).colorScheme.surfaceContainer,
                                 ),
                                 child: Row(
                                   children: <Widget>[
                                     Expanded(
                                       child: Text(
                                         item.tag,
-                                        style: Theme.of(context).textTheme.titleMedium,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleMedium,
                                       ),
                                     ),
                                     Text('${item.count} movs.'),
                                     const SizedBox(width: 10),
                                     Text(
                                       amountFormat.format(item.amount),
-                                      style: const TextStyle(fontWeight: FontWeight.w600),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -105,32 +113,49 @@ class _TagsPageState extends ConsumerState<TagsPage> {
                       Expanded(
                         child: expensesState.when(
                           data: (items) {
-                            final List<Expense> filtered = items.where((expense) {
-                              final List<String> tags =
-                                  expense.tags.isEmpty ? <String>[expense.category] : expense.tags;
-                              return tags.any((tag) => tag.toLowerCase() == activeTag.toLowerCase());
+                            final List<Expense> filtered = items.where((
+                              expense,
+                            ) {
+                              final List<String> tags = expense.tags.isEmpty
+                                  ? <String>[expense.category]
+                                  : expense.tags;
+                              return tags.any(
+                                (tag) =>
+                                    tag.toLowerCase() ==
+                                    activeTag.toLowerCase(),
+                              );
                             }).toList();
 
                             if (filtered.isEmpty) {
                               return const Center(
-                                child: Text('No hay movimientos para esta etiqueta.'),
+                                child: Text(
+                                  'No hay movimientos para esta etiqueta.',
+                                ),
                               );
                             }
 
                             return ListView.separated(
                               itemCount: filtered.length,
-                              separatorBuilder: (context, index) => const SizedBox(height: 8),
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(height: 8),
                               itemBuilder: (context, index) {
                                 final Expense expense = filtered[index];
-                                final bool isIncome = expense.type == TransactionType.income;
+                                final bool isIncome =
+                                    expense.type == TransactionType.income;
                                 return ListTile(
-                                  tileColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+                                  tileColor: Theme.of(
+                                    context,
+                                  ).colorScheme.surfaceContainerLowest,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   leading: Icon(
-                                    isIncome ? Icons.add_circle : Icons.remove_circle,
-                                    color: isIncome ? AppTheme.secondary : AppTheme.danger,
+                                    isIncome
+                                        ? Icons.add_circle
+                                        : Icons.remove_circle,
+                                    color: isIncome
+                                        ? AppTheme.secondary
+                                        : AppTheme.danger,
                                   ),
                                   title: Text(expense.description),
                                   subtitle: Text(expense.tags.join(' • ')),
@@ -138,7 +163,8 @@ class _TagsPageState extends ConsumerState<TagsPage> {
                               },
                             );
                           },
-                          loading: () => const Center(child: CircularProgressIndicator()),
+                          loading: () =>
+                              const Center(child: CircularProgressIndicator()),
                           error: (error, stackTrace) => const Center(
                             child: Text('No se pudo cargar los movimientos.'),
                           ),

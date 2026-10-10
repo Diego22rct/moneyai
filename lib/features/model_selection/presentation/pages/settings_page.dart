@@ -20,7 +20,10 @@ class SettingsPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const Text('Transcripcion de voz (STT)', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text(
+              'Transcripcion de voz (STT)',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             Expanded(
               child: ListView(
@@ -29,22 +32,32 @@ class SettingsPage extends ConsumerWidget {
                     child: ListTile(
                       leading: Icon(Icons.mic),
                       title: Text('Speech to Text (device)'),
-                      subtitle: Text('Modelo STT activo y unico para Android e iOS.'),
-                      trailing: Icon(Icons.check_circle, color: AppTheme.secondary),
+                      subtitle: Text(
+                        'Modelo STT activo y unico para Android e iOS.',
+                      ),
+                      trailing: Icon(
+                        Icons.check_circle,
+                        color: AppTheme.secondary,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text('Extraccion financiera (NLU)', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Extraccion financiera (NLU)',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   ...kNluModelOptions.map(
                     (option) => _ModelOptionTile(
                       option: option,
                       activeModel: activeNlu,
                       onSelected: option.available
-                          ? () => ref.read(modelSelectionControllerProvider.notifier).selectModel(
-                                task: AiTask.nlu,
-                                modelId: option.id,
-                              )
+                          ? () => ref
+                                .read(modelSelectionControllerProvider.notifier)
+                                .selectModel(
+                                  task: AiTask.nlu,
+                                  modelId: option.id,
+                                )
                           : null,
                     ),
                   ),
@@ -117,8 +130,8 @@ class _ModelOptionTile extends StatelessWidget {
         trailing: isSelected
             ? const Icon(Icons.check_circle, color: AppTheme.secondary)
             : option.available
-                ? const Icon(Icons.radio_button_unchecked)
-                : const Icon(Icons.lock_outline, color: AppTheme.onSurfaceMuted),
+            ? const Icon(Icons.radio_button_unchecked)
+            : const Icon(Icons.lock_outline, color: AppTheme.onSurfaceMuted),
         onTap: onSelected,
       ),
     );

@@ -22,7 +22,8 @@ const List<ModelOption> kSttModelOptions = <ModelOption>[
   ModelOption(
     id: 'speech_to_text',
     title: 'Speech to Text (device)',
-    description: 'Reconocimiento de voz del dispositivo. Compatible con Android e iOS.',
+    description:
+        'Reconocimiento de voz del dispositivo. Compatible con Android e iOS.',
   ),
 ];
 

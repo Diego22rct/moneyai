@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:moneyai/features/model_selection/domain/entities/llama_remote_file.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:moneyai/features/model_selection/domain/entities/llama_remote_file.dart';
 
 class HuggingFaceLlamaService {
   const HuggingFaceLlamaService();
@@ -33,7 +33,9 @@ class HuggingFaceLlamaService {
 
     final dynamic decoded = jsonDecode(response.body);
     if (decoded is! List<dynamic>) {
-      throw const FormatException('Respuesta invalida del catalogo de modelos.');
+      throw const FormatException(
+        'Respuesta invalida del catalogo de modelos.',
+      );
     }
 
     final List<LlamaRemoteFile> files = <LlamaRemoteFile>[];
@@ -48,7 +50,8 @@ class HuggingFaceLlamaService {
         continue;
       }
 
-      List<dynamic> siblings = (item['siblings'] as List<dynamic>?) ?? <dynamic>[];
+      List<dynamic> siblings =
+          (item['siblings'] as List<dynamic>?) ?? <dynamic>[];
       if (siblings.isEmpty) {
         siblings = await _fetchModelSiblings(modelId);
       }
@@ -73,14 +76,20 @@ class HuggingFaceLlamaService {
       }
     }
 
-    final List<LlamaRemoteFile> withResolvedSizes = await _resolveMissingSizes(files);
-    final List<LlamaRemoteFile> filtered = withResolvedSizes.where(_isMobileFriendly).toList();
+    final List<LlamaRemoteFile> withResolvedSizes = await _resolveMissingSizes(
+      files,
+    );
+    final List<LlamaRemoteFile> filtered = withResolvedSizes
+        .where(_isMobileFriendly)
+        .toList();
     filtered.sort(_compareByMobilePriority);
 
     return filtered.take(20).toList();
   }
 
-  Future<List<LlamaRemoteFile>> _resolveMissingSizes(List<LlamaRemoteFile> files) async {
+  Future<List<LlamaRemoteFile>> _resolveMissingSizes(
+    List<LlamaRemoteFile> files,
+  ) async {
     final List<LlamaRemoteFile> resolved = <LlamaRemoteFile>[];
     int requests = 0;
 
@@ -126,13 +135,15 @@ class HuggingFaceLlamaService {
     final String name = file.fileName.toLowerCase();
     final int? size = file.sizeBytes;
 
-    final bool quantized = name.contains('q2') ||
+    final bool quantized =
+        name.contains('q2') ||
         name.contains('q3') ||
         name.contains('q4') ||
         name.contains('q5') ||
         name.contains('iq');
 
-    final bool smallerFamily = name.contains('0.5b') ||
+    final bool smallerFamily =
+        name.contains('0.5b') ||
         name.contains('1b') ||
         name.contains('1_5b') ||
         name.contains('1.5b') ||
@@ -166,7 +177,9 @@ class HuggingFaceLlamaService {
   int _mobileRank(LlamaRemoteFile file) {
     final String name = file.fileName.toLowerCase();
 
-    if (name.contains('q4_k_m') || name.contains('q4km') || name.contains('q4_0')) {
+    if (name.contains('q4_k_m') ||
+        name.contains('q4km') ||
+        name.contains('q4_0')) {
       return 0;
     }
 
@@ -202,7 +215,9 @@ class HuggingFaceLlamaService {
     required void Function(int receivedBytes, int? totalBytes) onProgress,
   }) async {
     final Directory docsDir = await getApplicationDocumentsDirectory();
-    final Directory modelDir = Directory(p.join(docsDir.path, 'moneyai_models'));
+    final Directory modelDir = Directory(
+      p.join(docsDir.path, 'moneyai_models'),
+    );
     await modelDir.create(recursive: true);
 
     final String safeName = file.modelId.replaceAll('/', '__');

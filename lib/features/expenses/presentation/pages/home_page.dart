@@ -70,11 +70,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                           ? null
                           : () async {
                               await ref
-                                  .read(expenseCaptureControllerProvider.notifier)
+                                  .read(
+                                    expenseCaptureControllerProvider.notifier,
+                                  )
                                   .submitText(_textController.text);
                               if (mounted &&
                                   ref
-                                          .read(expenseCaptureControllerProvider)
+                                          .read(
+                                            expenseCaptureControllerProvider,
+                                          )
                                           .status ==
                                       CaptureStatus.success) {
                                 _textController.clear();
@@ -92,12 +96,17 @@ class _HomePageState extends ConsumerState<HomePage> {
                   const SizedBox(width: 12),
                   IconButton.filledTonal(
                     onPressed: () async {
-                      await ref.read(voiceInputControllerProvider.notifier).toggleListening(
+                      await ref
+                          .read(voiceInputControllerProvider.notifier)
+                          .toggleListening(
                             onText: (text) {
                               _textController.text = text;
-                              _textController.selection = TextSelection.fromPosition(
-                                TextPosition(offset: _textController.text.length),
-                              );
+                              _textController.selection =
+                                  TextSelection.fromPosition(
+                                    TextPosition(
+                                      offset: _textController.text.length,
+                                    ),
+                                  );
                             },
                           );
                     },
@@ -120,7 +129,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                 const SizedBox.shrink(),
               if (voiceState.isListening || voiceState.errorMessage != null)
                 const SizedBox(height: 12),
-              _CaptureFeedback(message: captureState.message, status: captureState.status),
+              _CaptureFeedback(
+                message: captureState.message,
+                status: captureState.status,
+              ),
               const SizedBox(height: 12),
               Expanded(
                 child: expensesState.when(
@@ -131,12 +143,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                       );
                     }
                     return ListView.separated(
-                      itemBuilder: (context, index) => ExpenseTile(expense: expenses[index]),
-                      separatorBuilder: (context, index) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) =>
+                          ExpenseTile(expense: expenses[index]),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 8),
                       itemCount: expenses.length,
                     );
                   },
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (error, stackTrace) => const Center(
                     child: Text('No se pudo cargar la lista de gastos.'),
                   ),
@@ -179,10 +194,7 @@ class _CaptureFeedback extends StatelessWidget {
         color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(
-        message!,
-        style: TextStyle(color: color),
-      ),
+      child: Text(message!, style: TextStyle(color: color)),
     );
   }
 }
@@ -218,7 +230,8 @@ class ExpenseTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: (isIncome ? AppTheme.secondary : AppTheme.danger).withValues(alpha: 0.14),
+                color: (isIncome ? AppTheme.secondary : AppTheme.danger)
+                    .withValues(alpha: 0.14),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(

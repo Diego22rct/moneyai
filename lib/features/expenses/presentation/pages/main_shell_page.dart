@@ -37,9 +37,9 @@ class _MainShellPageState extends State<MainShellPage> {
             Text(
               _titles[_index],
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    letterSpacing: 4,
-                    fontWeight: FontWeight.w700,
-                  ),
+                letterSpacing: 4,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ),
@@ -47,9 +47,7 @@ class _MainShellPageState extends State<MainShellPage> {
           IconButton(
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const SettingsPage(),
-                ),
+                MaterialPageRoute<void>(builder: (_) => const SettingsPage()),
               );
             },
             icon: const Icon(Icons.notifications),
@@ -60,11 +58,7 @@ class _MainShellPageState extends State<MainShellPage> {
       ),
       body: IndexedStack(
         index: _index,
-        children: const <Widget>[
-          DashboardPage(),
-          CapturePage(),
-          TagsPage(),
-        ],
+        children: const <Widget>[DashboardPage(), CapturePage(), TagsPage()],
       ),
       bottomNavigationBar: Container(
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -110,7 +104,11 @@ class _MainShellPageState extends State<MainShellPage> {
               ),
               child: IconButton(
                 onPressed: () => setState(() => _index = 1),
-                icon: const Icon(Icons.add, color: AppTheme.background, size: 28),
+                icon: const Icon(
+                  Icons.add,
+                  color: AppTheme.background,
+                  size: 28,
+                ),
               ),
             ),
             _NavItem(

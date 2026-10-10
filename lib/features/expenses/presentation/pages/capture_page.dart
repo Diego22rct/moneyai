@@ -17,7 +17,8 @@ class CapturePage extends ConsumerStatefulWidget {
   ConsumerState<CapturePage> createState() => _CapturePageState();
 }
 
-class _CapturePageState extends ConsumerState<CapturePage> with SingleTickerProviderStateMixin {
+class _CapturePageState extends ConsumerState<CapturePage>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   late final AnimationController _waveController;
 
@@ -62,9 +63,9 @@ class _CapturePageState extends ConsumerState<CapturePage> with SingleTickerProv
               : '"${_textController.text}"',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w500,
-                height: 1.25,
-              ),
+            fontWeight: FontWeight.w500,
+            height: 1.25,
+          ),
         ),
         const SizedBox(height: 26),
         Center(
@@ -97,7 +98,9 @@ class _CapturePageState extends ConsumerState<CapturePage> with SingleTickerProv
               child: _InfoStatCard(
                 title: 'TYPE',
                 value: _draftTypeText(captureState),
-                valueColor: _draftIsIncome(captureState) ? AppTheme.secondary : AppTheme.primary,
+                valueColor: _draftIsIncome(captureState)
+                    ? AppTheme.secondary
+                    : AppTheme.primary,
               ),
             ),
           ],
@@ -135,17 +138,25 @@ class _CapturePageState extends ConsumerState<CapturePage> with SingleTickerProv
           ),
         ),
         const SizedBox(height: 14),
-        _CaptureFeedback(message: captureState.message, status: captureState.status),
+        _CaptureFeedback(
+          message: captureState.message,
+          status: captureState.status,
+        ),
         if (voiceState.errorMessage != null) ...<Widget>[
           const SizedBox(height: 10),
-          _CaptureFeedback(message: voiceState.errorMessage, status: CaptureStatus.error),
+          _CaptureFeedback(
+            message: voiceState.errorMessage,
+            status: CaptureStatus.error,
+          ),
         ],
         const SizedBox(height: 18),
         Center(
           child: _MicActionButton(
             isListening: voiceState.isListening,
             onTap: () async {
-              await ref.read(voiceInputControllerProvider.notifier).toggleListening(
+              await ref
+                  .read(voiceInputControllerProvider.notifier)
+                  .toggleListening(
                     onText: (text) {
                       _textController.text = text;
                       _textController.selection = TextSelection.fromPosition(
@@ -162,7 +173,9 @@ class _CapturePageState extends ConsumerState<CapturePage> with SingleTickerProv
           onPressed: captureState.status == CaptureStatus.loading
               ? null
               : () async {
-                  await ref.read(expenseCaptureControllerProvider.notifier).submitText(_textController.text);
+                  await ref
+                      .read(expenseCaptureControllerProvider.notifier)
+                      .submitText(_textController.text);
 
                   if (!context.mounted) {
                     return;
@@ -171,7 +184,9 @@ class _CapturePageState extends ConsumerState<CapturePage> with SingleTickerProv
                   final updated = ref.read(expenseCaptureControllerProvider);
                   if (updated.status == CaptureStatus.reviewing) {
                     await Navigator.of(context).push(
-                      MaterialPageRoute<void>(builder: (context) => const ReviewInterpretationPage()),
+                      MaterialPageRoute<void>(
+                        builder: (context) => const ReviewInterpretationPage(),
+                      ),
                     );
                   }
 
@@ -198,7 +213,9 @@ class _CapturePageState extends ConsumerState<CapturePage> with SingleTickerProv
         const SizedBox(height: 24),
         Text(
           'Ledger Activity',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 10),
         expensesState.when(
@@ -217,7 +234,8 @@ class _CapturePageState extends ConsumerState<CapturePage> with SingleTickerProv
             );
           },
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stackTrace) => const _GlassInfo('No se pudo cargar la lista de movimientos.'),
+          error: (error, stackTrace) =>
+              const _GlassInfo('No se pudo cargar la lista de movimientos.'),
         ),
       ],
     );
@@ -229,7 +247,10 @@ class _CapturePageState extends ConsumerState<CapturePage> with SingleTickerProv
       return '--';
     }
 
-    return NumberFormat.currency(locale: 'es_PE', symbol: '${draft.currency} ').format(draft.amount);
+    return NumberFormat.currency(
+      locale: 'es_PE',
+      symbol: '${draft.currency} ',
+    ).format(draft.amount);
   }
 
   bool _draftIsIncome(ExpenseCaptureState state) {
@@ -256,8 +277,10 @@ class _Waveform extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List<Widget>.generate(13, (index) {
         final double phase = (index / 13) * math.pi;
-        final double normalized = (math.sin((factor * math.pi * 2) + phase).abs() * 0.75) + 0.25;
-        final double height = (active ? 18 : 8) + (normalized * (active ? 46 : 16));
+        final double normalized =
+            (math.sin((factor * math.pi * 2) + phase).abs() * 0.75) + 0.25;
+        final double height =
+            (active ? 18 : 8) + (normalized * (active ? 46 : 16));
         final bool accent = index % 4 == 0;
 
         return Padding(
@@ -307,13 +330,23 @@ class _InfoStatCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(title, style: const TextStyle(color: AppTheme.onSurfaceMuted, letterSpacing: 1.3)),
+          Text(
+            title,
+            style: const TextStyle(
+              color: AppTheme.onSurfaceMuted,
+              letterSpacing: 1.3,
+            ),
+          ),
           const SizedBox(height: 6),
           Text(
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: valueColor, fontSize: 34, fontWeight: FontWeight.w700),
+            style: TextStyle(
+              color: valueColor,
+              fontSize: 34,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),
@@ -422,7 +455,11 @@ class _MovementTile extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(expense.description, maxLines: 1, overflow: TextOverflow.ellipsis),
+            child: Text(
+              expense.description,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
           const SizedBox(width: 8),
           Text(

@@ -8,18 +8,26 @@ class LlamaModelDownloadPage extends ConsumerStatefulWidget {
   const LlamaModelDownloadPage({super.key});
 
   @override
-  ConsumerState<LlamaModelDownloadPage> createState() => _LlamaModelDownloadPageState();
+  ConsumerState<LlamaModelDownloadPage> createState() =>
+      _LlamaModelDownloadPageState();
 }
 
-class _LlamaModelDownloadPageState extends ConsumerState<LlamaModelDownloadPage> {
-  final TextEditingController _searchController = TextEditingController(text: 'qwen gguf');
+class _LlamaModelDownloadPageState
+    extends ConsumerState<LlamaModelDownloadPage> {
+  final TextEditingController _searchController = TextEditingController(
+    text: 'qwen gguf',
+  );
 
   @override
   void initState() {
     super.initState();
     Future<void>.microtask(() async {
-      await ref.read(modelDownloadControllerProvider.notifier).loadCurrentPath();
-      await ref.read(modelDownloadControllerProvider.notifier).search(_searchController.text);
+      await ref
+          .read(modelDownloadControllerProvider.notifier)
+          .loadCurrentPath();
+      await ref
+          .read(modelDownloadControllerProvider.notifier)
+          .search(_searchController.text);
     });
   }
 
@@ -50,15 +58,17 @@ class _LlamaModelDownloadPageState extends ConsumerState<LlamaModelDownloadPage>
                     onPressed: state.isSearching
                         ? null
                         : () {
-                            ref.read(modelDownloadControllerProvider.notifier).search(
-                                  _searchController.text,
-                                );
+                            ref
+                                .read(modelDownloadControllerProvider.notifier)
+                                .search(_searchController.text);
                           },
                     icon: const Icon(Icons.search),
                   ),
                 ),
                 onSubmitted: (value) {
-                  ref.read(modelDownloadControllerProvider.notifier).search(value);
+                  ref
+                      .read(modelDownloadControllerProvider.notifier)
+                      .search(value);
                 },
               ),
               const SizedBox(height: 8),
@@ -70,52 +80,66 @@ class _LlamaModelDownloadPageState extends ConsumerState<LlamaModelDownloadPage>
               _CurrentModelBanner(path: state.activeFilePath),
               if (state.isDownloading) ...<Widget>[
                 const SizedBox(height: 12),
-                LinearProgressIndicator(value: state.progress == 0 ? null : state.progress),
+                LinearProgressIndicator(
+                  value: state.progress == 0 ? null : state.progress,
+                ),
                 const SizedBox(height: 6),
                 Text('${(state.progress * 100).toStringAsFixed(1)}%'),
               ],
               if (state.statusMessage != null) ...<Widget>[
                 const SizedBox(height: 10),
-                Text(state.statusMessage!, style: const TextStyle(color: AppTheme.secondary)),
+                Text(
+                  state.statusMessage!,
+                  style: const TextStyle(color: AppTheme.secondary),
+                ),
               ],
               if (state.errorMessage != null) ...<Widget>[
                 const SizedBox(height: 10),
-                Text(state.errorMessage!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                Text(
+                  state.errorMessage!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
               ],
               const SizedBox(height: 12),
               Expanded(
                 child: state.isSearching
                     ? const Center(child: CircularProgressIndicator())
                     : state.results.isEmpty
-                        ? const Center(
-                            child: Text(
-                              'No hay resultados mobile-friendly para esa busqueda.\nPrueba: qwen 1.5b gguf o llama 3b q4.',
-                              textAlign: TextAlign.center,
-                            ),
-                          )
-                        : ListView.separated(
-                            itemCount: state.results.length,
-                            separatorBuilder: (context, index) => const SizedBox(height: 8),
-                            itemBuilder: (context, index) {
-                              final file = state.results[index];
-                              return _ModelFileTile(
-                                file: file,
-                                isDownloading: state.isDownloading,
-                                onDownload: () async {
-                                  final bool confirmed = await _confirmDownload(context, file);
-                                  if (!confirmed) {
-                                    return;
-                                  }
-                                  if (!mounted) {
-                                    return;
-                                  }
-                                  await ref
-                                      .read(modelDownloadControllerProvider.notifier)
-                                      .downloadAndActivate(file);
-                                },
+                    ? const Center(
+                        child: Text(
+                          'No hay resultados mobile-friendly para esa busqueda.\nPrueba: qwen 1.5b gguf o llama 3b q4.',
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    : ListView.separated(
+                        itemCount: state.results.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 8),
+                        itemBuilder: (context, index) {
+                          final file = state.results[index];
+                          return _ModelFileTile(
+                            file: file,
+                            isDownloading: state.isDownloading,
+                            onDownload: () async {
+                              final bool confirmed = await _confirmDownload(
+                                context,
+                                file,
                               );
+                              if (!confirmed) {
+                                return;
+                              }
+                              if (!mounted) {
+                                return;
+                              }
+                              await ref
+                                  .read(
+                                    modelDownloadControllerProvider.notifier,
+                                  )
+                                  .downloadAndActivate(file);
                             },
-                          ),
+                          );
+                        },
+                      ),
               ),
             ],
           ),
@@ -124,7 +148,10 @@ class _LlamaModelDownloadPageState extends ConsumerState<LlamaModelDownloadPage>
     );
   }
 
-  Future<bool> _confirmDownload(BuildContext context, LlamaRemoteFile file) async {
+  Future<bool> _confirmDownload(
+    BuildContext context,
+    LlamaRemoteFile file,
+  ) async {
     final bool? accepted = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -166,7 +193,9 @@ class _CurrentModelBanner extends StatelessWidget {
         color: AppTheme.surfaceHigh.withValues(alpha: 0.75),
       ),
       child: Text(
-        hasModel ? 'Modelo activo:\n$path' : 'Aun no hay modelo local descargado.',
+        hasModel
+            ? 'Modelo activo:\n$path'
+            : 'Aun no hay modelo local descargado.',
         style: const TextStyle(fontSize: 12),
       ),
     );

@@ -22,10 +22,9 @@ final localDataSourceProvider = Provider<ExpenseLocalDataSource>((ref) {
 });
 
 final nluServiceProvider = Provider<NluService>((ref) {
-  final selected = ref.watch(activeNluModelProvider).maybeWhen(
-        data: (value) => value,
-        orElse: () => 'regex_local',
-      );
+  final selected = ref
+      .watch(activeNluModelProvider)
+      .maybeWhen(data: (value) => value, orElse: () => 'regex_local');
 
   if (selected == 'llama_local') {
     return LlamaNluService(ref.watch(aiRuntimeConfigLocalDataSourceProvider));
@@ -53,15 +52,13 @@ final recordTextExpenseProvider = Provider<RecordTextExpense>((ref) {
   return RecordTextExpense(ref.watch(expenseRepositoryProvider));
 });
 
-final expenseListProvider = AsyncNotifierProvider<ExpenseListNotifier, List<Expense>>(
-  ExpenseListNotifier.new,
-);
+final expenseListProvider =
+    AsyncNotifierProvider<ExpenseListNotifier, List<Expense>>(
+      ExpenseListNotifier.new,
+    );
 
 class MonthlyBalanceSummary {
-  const MonthlyBalanceSummary({
-    required this.income,
-    required this.expense,
-  });
+  const MonthlyBalanceSummary({required this.income, required this.expense});
 
   final double income;
   final double expense;
@@ -81,7 +78,9 @@ class TagTotal {
   final int count;
 }
 
-final monthlyBalanceProvider = Provider<AsyncValue<MonthlyBalanceSummary>>((ref) {
+final monthlyBalanceProvider = Provider<AsyncValue<MonthlyBalanceSummary>>((
+  ref,
+) {
   final AsyncValue<List<Expense>> value = ref.watch(expenseListProvider);
 
   return value.whenData((items) {
@@ -114,7 +113,9 @@ final tagRankingProvider = Provider<AsyncValue<List<TagTotal>>>((ref) {
     final Map<String, TagTotal> map = <String, TagTotal>{};
 
     for (final Expense expense in items) {
-      final List<String> tags = expense.tags.isEmpty ? <String>[expense.category] : expense.tags;
+      final List<String> tags = expense.tags.isEmpty
+          ? <String>[expense.category]
+          : expense.tags;
 
       for (final String rawTag in tags) {
         final String tag = rawTag.trim();
@@ -146,6 +147,8 @@ class ExpenseListNotifier extends AsyncNotifier<List<Expense>> {
 
   Future<void> refreshList() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() => ref.read(fetchExpensesProvider).call());
+    state = await AsyncValue.guard(
+      () => ref.read(fetchExpensesProvider).call(),
+    );
   }
 }

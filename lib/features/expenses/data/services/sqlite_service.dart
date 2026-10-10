@@ -125,7 +125,10 @@ class SQLiteService {
     });
   }
 
-  Future<void> _ensureDefaultRuntimeConfig(Database db, {required String task}) async {
+  Future<void> _ensureDefaultRuntimeConfig(
+    Database db, {
+    required String task,
+  }) async {
     final List<Map<String, Object?>> existing = await db.query(
       modelRuntimeConfigsTable,
       where: 'task = ?',

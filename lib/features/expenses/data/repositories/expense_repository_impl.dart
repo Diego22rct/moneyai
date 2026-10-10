@@ -1,5 +1,5 @@
-import 'package:moneyai/features/expenses/data/datasources/expense_local_datasource.dart';
 import 'package:moneyai/features/ai_services/domain/services/nlu_service.dart';
+import 'package:moneyai/features/expenses/data/datasources/expense_local_datasource.dart';
 import 'package:moneyai/features/expenses/data/services/local_nlu_service.dart';
 import 'package:moneyai/features/expenses/domain/entities/expense.dart';
 import 'package:moneyai/features/expenses/domain/repositories/expense_repository.dart';
@@ -8,8 +8,8 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   ExpenseRepositoryImpl({
     required ExpenseLocalDataSource localDataSource,
     required NluService nluService,
-  })  : _localDataSource = localDataSource,
-        _nluService = nluService;
+  }) : _localDataSource = localDataSource,
+       _nluService = nluService;
 
   final ExpenseLocalDataSource _localDataSource;
   final NluService _nluService;
@@ -29,7 +29,8 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
       parsed = await const LocalNluService().extractMovement(text);
     }
 
-    final String typeValue = parsed['type'] as String? ?? TransactionType.expense.name;
+    final String typeValue =
+        parsed['type'] as String? ?? TransactionType.expense.name;
     final String detectedCategory = parsed['category'] as String? ?? 'Otros';
 
     return Expense(

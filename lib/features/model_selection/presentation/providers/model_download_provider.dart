@@ -50,14 +50,16 @@ class ModelDownloadState {
   }
 }
 
-final huggingFaceLlamaServiceProvider = Provider<HuggingFaceLlamaService>((ref) {
+final huggingFaceLlamaServiceProvider = Provider<HuggingFaceLlamaService>((
+  ref,
+) {
   return const HuggingFaceLlamaService();
 });
 
 final modelDownloadControllerProvider =
     StateNotifierProvider<ModelDownloadController, ModelDownloadState>(
-  (ref) => ModelDownloadController(ref),
-);
+      (ref) => ModelDownloadController(ref),
+    );
 
 class ModelDownloadController extends StateNotifier<ModelDownloadState> {
   ModelDownloadController(this._ref) : super(const ModelDownloadState());
@@ -65,7 +67,9 @@ class ModelDownloadController extends StateNotifier<ModelDownloadState> {
   final Ref _ref;
 
   Future<void> loadCurrentPath() async {
-    final String? current = await _ref.read(aiRuntimeConfigLocalDataSourceProvider).getModelPath(AiTask.nlu);
+    final String? current = await _ref
+        .read(aiRuntimeConfigLocalDataSourceProvider)
+        .getModelPath(AiTask.nlu);
     state = state.copyWith(activeFilePath: current);
   }
 
@@ -89,19 +93,19 @@ class ModelDownloadController extends StateNotifier<ModelDownloadState> {
     );
 
     try {
-      final List<LlamaRemoteFile> files =
-          await _ref.read(huggingFaceLlamaServiceProvider).searchGgufFiles(trimmed);
+      final List<LlamaRemoteFile> files = await _ref
+          .read(huggingFaceLlamaServiceProvider)
+          .searchGgufFiles(trimmed);
 
       state = state.copyWith(
         isSearching: false,
         results: files,
-        statusMessage: files.isEmpty ? 'No se encontraron archivos GGUF para "$trimmed".' : null,
+        statusMessage: files.isEmpty
+            ? 'No se encontraron archivos GGUF para "$trimmed".'
+            : null,
       );
     } on FormatException catch (error) {
-      state = state.copyWith(
-        isSearching: false,
-        errorMessage: error.message,
-      );
+      state = state.copyWith(isSearching: false, errorMessage: error.message);
     } catch (_) {
       state = state.copyWith(
         isSearching: false,
@@ -123,23 +127,25 @@ class ModelDownloadController extends StateNotifier<ModelDownloadState> {
     );
 
     try {
-      final String localPath = await _ref.read(huggingFaceLlamaServiceProvider).downloadGguf(
+      final String localPath = await _ref
+          .read(huggingFaceLlamaServiceProvider)
+          .downloadGguf(
             file: file,
             onProgress: (received, total) {
-              final double ratio = total == null || total <= 0 ? 0 : (received / total).clamp(0, 1);
+              final double ratio = total == null || total <= 0
+                  ? 0
+                  : (received / total).clamp(0, 1);
               state = state.copyWith(progress: ratio);
             },
           );
 
-      await _ref.read(aiRuntimeConfigLocalDataSourceProvider).setModelPath(
-            task: AiTask.nlu,
-            path: localPath,
-          );
+      await _ref
+          .read(aiRuntimeConfigLocalDataSourceProvider)
+          .setModelPath(task: AiTask.nlu, path: localPath);
 
-      await _ref.read(modelConfigLocalDataSourceProvider).setActiveModel(
-            task: AiTask.nlu,
-            modelId: 'llama_local',
-          );
+      await _ref
+          .read(modelConfigLocalDataSourceProvider)
+          .setActiveModel(task: AiTask.nlu, modelId: 'llama_local');
 
       _ref.invalidate(nluModelPathProvider);
       _ref.invalidate(activeNluModelProvider);
@@ -151,10 +157,7 @@ class ModelDownloadController extends StateNotifier<ModelDownloadState> {
         statusMessage: 'Modelo descargado y activado correctamente.',
       );
     } on FormatException catch (error) {
-      state = state.copyWith(
-        isDownloading: false,
-        errorMessage: error.message,
-      );
+      state = state.copyWith(isDownloading: false, errorMessage: error.message);
     } catch (_) {
       state = state.copyWith(
         isDownloading: false,

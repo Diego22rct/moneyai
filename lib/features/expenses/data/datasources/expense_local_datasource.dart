@@ -25,6 +25,8 @@ class ExpenseLocalDataSource {
       orderBy: 'timestamp DESC',
     );
 
-    return rows.map((Map<String, Object?> row) => Expense.fromMap(row)).toList();
+    return rows
+        .map((Map<String, Object?> row) => Expense.fromMap(row))
+        .toList();
   }
 }

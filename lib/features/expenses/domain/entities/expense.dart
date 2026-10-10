@@ -59,7 +59,8 @@ class Expense {
   }
 
   factory Expense.fromMap(Map<String, Object?> map) {
-    final String typeValue = (map['type'] as String?) ?? TransactionType.expense.name;
+    final String typeValue =
+        (map['type'] as String?) ?? TransactionType.expense.name;
     final String rawTags = (map['tags_json'] as String?) ?? '[]';
     final List<String> parsedTags = _decodeTags(rawTags);
 
