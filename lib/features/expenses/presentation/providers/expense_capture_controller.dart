@@ -133,6 +133,14 @@ class ExpenseCaptureController extends StateNotifier<ExpenseCaptureState> {
     }
   }
 
+  void startReview(MovementDraft draft, {String? message}) {
+    state = state.copyWith(
+      status: CaptureStatus.reviewing,
+      message: message ?? 'Revisa el movimiento antes de registrar.',
+      pendingDraft: draft,
+    );
+  }
+
   void updateDraftDescription(String value) {
     final MovementDraft? draft = state.pendingDraft;
     if (draft == null) {

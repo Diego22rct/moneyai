@@ -4,6 +4,7 @@ import 'package:moneyai/core/theme/app_theme.dart';
 import 'package:moneyai/features/model_selection/domain/entities/model_option.dart';
 import 'package:moneyai/features/model_selection/presentation/pages/llama_model_download_page.dart';
 import 'package:moneyai/features/model_selection/presentation/providers/model_selector_provider.dart';
+import 'package:moneyai/features/wallet_capture/presentation/widgets/notification_capture_settings_section.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -14,21 +15,19 @@ class SettingsPage extends ConsumerWidget {
     final nluModelPath = ref.watch(nluModelPathProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Configuracion de Modelos')),
+      appBar: AppBar(title: const Text('Configuracion')),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: <Widget>[
+            const NotificationCaptureSettingsSection(),
+            const SizedBox(height: 24),
             const Text(
               'Transcripcion de voz (STT)',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Expanded(
-              child: ListView(
-                children: <Widget>[
-                  const Card(
+            const Card(
                     child: ListTile(
                       leading: Icon(Icons.mic),
                       title: Text('Speech to Text (device)'),
@@ -89,9 +88,6 @@ class SettingsPage extends ConsumerWidget {
                     ),
                 ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }

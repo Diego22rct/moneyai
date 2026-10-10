@@ -24,3 +24,4 @@ Este directorio contiene el mapeo funcional del core MVP implementado en la app.
 - HU-005 Privacidad local-first
 - HU-006 Estados de UI
 - HU-007 Preparación para STT
+- HU-008 Captura de notificaciones de billetera digital

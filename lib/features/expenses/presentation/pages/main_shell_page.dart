@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moneyai/core/theme/app_theme.dart';
 import 'package:moneyai/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:moneyai/features/expenses/presentation/pages/capture_page.dart';
 import 'package:moneyai/features/model_selection/presentation/pages/settings_page.dart';
 import 'package:moneyai/features/tags/presentation/pages/tags_page.dart';
+import 'package:moneyai/features/wallet_capture/presentation/pages/wallet_inbox_page.dart';
+import 'package:moneyai/features/wallet_capture/presentation/providers/wallet_capture_providers.dart';
 
 class MainShellPage extends StatefulWidget {
   const MainShellPage({super.key});
@@ -44,14 +47,27 @@ class _MainShellPageState extends State<MainShellPage> {
           ],
         ),
         actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(builder: (_) => const SettingsPage()),
+          Consumer(
+            builder: (context, ref, child) {
+              final pendingCount = ref.watch(pendingCaptureCountProvider);
+              return IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const WalletInboxPage(),
+                    ),
+                  );
+                },
+                icon: Badge.count(
+                  count: pendingCount,
+                  isLabelVisible: pendingCount > 0,
+                  backgroundColor: AppTheme.primary,
+                  textColor: AppTheme.background,
+                  child: const Icon(Icons.notifications_outlined),
+                ),
+                tooltip: 'Bandeja de billeteras',
               );
             },
-            icon: const Icon(Icons.notifications),
-            tooltip: 'Modelos IA',
           ),
           const SizedBox(width: 6),
         ],

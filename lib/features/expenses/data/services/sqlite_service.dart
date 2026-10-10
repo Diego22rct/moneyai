@@ -5,6 +5,7 @@ class SQLiteService {
   static const String expensesTable = 'expenses';
   static const String modelConfigsTable = 'model_configs';
   static const String modelRuntimeConfigsTable = 'model_runtime_configs';
+  static const String walletCapturesTable = 'wallet_captures';
 
   Database? _database;
 
@@ -18,11 +19,12 @@ class SQLiteService {
 
     _database = await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: (Database db, int version) async {
         await _createExpensesTable(db);
         await _createModelConfigsTable(db);
         await _createModelRuntimeConfigsTable(db);
+        await _createWalletCapturesTable(db);
         await _seedDefaultModels(db);
         await _seedDefaultRuntimeConfig(db);
       },
@@ -46,10 +48,39 @@ class SQLiteService {
             "ALTER TABLE $expensesTable ADD COLUMN tags_json TEXT NOT NULL DEFAULT '[]'",
           );
         }
+
+        if (oldVersion < 5) {
+          await _createWalletCapturesTable(db);
+        }
       },
     );
 
     return _database!;
+  }
+
+  /// Movements detected from wallet notifications, waiting for user review.
+  Future<void> _createWalletCapturesTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS $walletCapturesTable (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        origin TEXT NOT NULL,
+        source TEXT NOT NULL,
+        dedupe_key TEXT NOT NULL UNIQUE,
+        raw_title TEXT,
+        raw_text TEXT,
+        amount REAL NOT NULL,
+        currency TEXT NOT NULL,
+        type TEXT NOT NULL DEFAULT 'expense',
+        merchant TEXT,
+        posted_at TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        expense_id INTEGER,
+        created_at TEXT NOT NULL
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_wallet_captures_status ON $walletCapturesTable(status)',
+    );
   }
 
   Future<void> _createExpensesTable(Database db) async {

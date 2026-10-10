@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moneyai/core/theme/app_theme.dart';
 import 'package:moneyai/features/expenses/presentation/pages/main_shell_page.dart';
+import 'package:moneyai/features/wallet_capture/presentation/widgets/capture_lifecycle_listener.dart';
 
 class MoneyAiApp extends StatelessWidget {
   const MoneyAiApp({super.key});
@@ -12,7 +13,7 @@ class MoneyAiApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme(),
       themeMode: ThemeMode.dark,
-      home: const MainShellPage(),
+      home: const CaptureLifecycleListener(child: MainShellPage()),
     );
   }
 }
