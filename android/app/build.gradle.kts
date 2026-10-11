@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.github.diego22rct.moneyai"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
